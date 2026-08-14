@@ -289,5 +289,63 @@ void main() {
 
       expect(result.length, lessThanOrEqualTo(4));
     });
+
+    test(
+      'does not select same replacement topic for two invalid tasks',
+      () {
+        final result = refreshPlan(
+          PlanRefreshInput(
+            previousTasks: [
+              task(
+                topicId: 'old_a',
+                type: StudyTaskType.repair,
+              ),
+              task(
+                topicId: 'old_b',
+                type: StudyTaskType.repair,
+              ),
+            ],
+            previousTaskStates: [
+              state('old_a'),
+              state('old_b'),
+            ],
+            refreshedCandidates: [
+              candidate(
+                topicId: 'replacement_a',
+                source: CandidateSource.repair,
+              ),
+              candidate(
+                topicId: 'replacement_b',
+                source: CandidateSource.repair,
+              ),
+            ],
+            rankedRefreshedTasks: [
+              task(
+                topicId: 'replacement_a',
+                type: StudyTaskType.repair,
+              ),
+              task(
+                topicId: 'replacement_b',
+                type: StudyTaskType.repair,
+              ),
+            ],
+            lifecycle: PlanLifecycle.draftUntouched,
+            selectionConfig: const PlanRefreshSelectionConfig(
+              maxTasks: 4,
+            ),
+          ),
+        );
+
+        expect(result, hasLength(2));
+
+        expect(
+          result.map((task) => task.topicId).toSet(),
+          {
+            'replacement_a',
+            'replacement_b',
+          },
+        );
+      },
+    );
   });
 }
