@@ -54,6 +54,7 @@ void main() {
       );
 
       expect(result.outcome, GateOutcome.locked);
+
       expect(
         result.lockedPrerequisiteTopicIds,
         contains('fonksiyonlar'),
@@ -79,6 +80,7 @@ void main() {
         );
 
         expect(result.outcome, GateOutcome.bridgeRequired);
+
         expect(
           result.bridgePrerequisiteTopicIds,
           contains('fonksiyonlar'),
@@ -200,6 +202,84 @@ void main() {
         );
 
         expect(result.outcome, GateOutcome.open);
+      },
+    );
+
+    test(
+      'soft-only prerequisite never locks or creates bridge',
+      () {
+        // Fonksiyonlar'ın doğrudan prerequisite'i Denklem Çözme'dir,
+        // fakat bu edge soft'tur.
+        //
+        // Denklem Çözme tamamen untouched olsa bile Fonksiyonlar
+        // hard gate tarafından kilitlenmemelidir.
+        final result = evaluatePrerequisiteGate(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({}),
+          targetTopicId: 'fonksiyonlar',
+          config: config,
+        );
+
+        expect(result.outcome, GateOutcome.open);
+
+        expect(
+          result.lockedPrerequisiteTopicIds,
+          isEmpty,
+        );
+
+        expect(
+          result.bridgePrerequisiteTopicIds,
+          isEmpty,
+        );
+
+        expect(
+          result.verificationPrerequisiteTopicIds,
+          isEmpty,
+        );
+      },
+    );
+
+    test(
+      'weak soft prerequisite never appears in hard gate result lists',
+      () {
+        final result = evaluatePrerequisiteGate(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({
+            'fonksiyonlar': state(
+              topicId: 'fonksiyonlar',
+              hasEvidence: true,
+              band: MasteryBand.consolidated,
+              score: 90.0,
+              confidence: 0.90,
+            ),
+            'oran_oranti': state(
+              topicId: 'oran_oranti',
+              hasEvidence: true,
+              band: MasteryBand.learning,
+              score: 20.0,
+              confidence: 0.40,
+            ),
+          }),
+          targetTopicId: 'trigonometri',
+          config: config,
+        );
+
+        expect(result.outcome, GateOutcome.open);
+
+        expect(
+          result.lockedPrerequisiteTopicIds,
+          isNot(contains('oran_oranti')),
+        );
+
+        expect(
+          result.bridgePrerequisiteTopicIds,
+          isNot(contains('oran_oranti')),
+        );
+
+        expect(
+          result.verificationPrerequisiteTopicIds,
+          isNot(contains('oran_oranti')),
+        );
       },
     );
 
