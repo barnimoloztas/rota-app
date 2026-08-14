@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/mastery.dart';
+import 'package:rota_app/domain/mastery_band.dart';
 import 'package:rota_app/domain/student_learning_snapshot.dart';
 import 'package:rota_app/domain/student_topic_state.dart';
 
@@ -15,6 +16,7 @@ void main() {
           score: 72.0,
           confidence: 0.65,
         ),
+        masteryBand: MasteryBand.developing,
         lastMeaningfulEvidenceAt: DateTime.utc(2026, 8, 13),
         calculatedAt: calculatedAt,
       );
@@ -50,6 +52,7 @@ void main() {
               score: 70.0,
               confidence: 0.7,
             ),
+            masteryBand: MasteryBand.developing,
             lastMeaningfulEvidenceAt: DateTime.utc(2026, 8, 13),
             calculatedAt: calculatedAt,
           ),
@@ -60,6 +63,7 @@ void main() {
               score: 0.0,
               confidence: 0.0,
             ),
+            masteryBand: MasteryBand.notStarted,
             lastMeaningfulEvidenceAt: null,
             calculatedAt: calculatedAt,
           ),

@@ -42,12 +42,14 @@ void main() {
           score: 0.0,
           confidence: 0.0,
         ),
+        masteryBand: MasteryBand.notStarted,
         lastMeaningfulEvidenceAt: null,
         calculatedAt: calculatedAt,
       );
 
       expect(state.topicId, 'fonksiyonlar');
       expect(state.hasEvidence, isFalse);
+      expect(state.masteryBand, MasteryBand.notStarted);
       expect(state.lastMeaningfulEvidenceAt, isNull);
       expect(state.mastery.score, 0.0);
       expect(state.mastery.confidence, 0.0);
@@ -64,11 +66,13 @@ void main() {
           score: 28.0,
           confidence: 0.18,
         ),
+        masteryBand: MasteryBand.learning,
         lastMeaningfulEvidenceAt: evidenceAt,
         calculatedAt: calculatedAt,
       );
 
       expect(state.hasEvidence, isTrue);
+      expect(state.masteryBand, MasteryBand.learning);
       expect(state.mastery.score, 28.0);
       expect(state.mastery.confidence, 0.18);
       expect(state.lastMeaningfulEvidenceAt, evidenceAt);
@@ -85,10 +89,12 @@ void main() {
           score: 88.0,
           confidence: 0.22,
         ),
+        masteryBand: MasteryBand.proficient,
         lastMeaningfulEvidenceAt: evidenceAt,
         calculatedAt: calculatedAt,
       );
 
+      expect(state.masteryBand, MasteryBand.proficient);
       expect(state.mastery.score, greaterThan(80.0));
       expect(state.mastery.confidence, lessThan(0.3));
     });

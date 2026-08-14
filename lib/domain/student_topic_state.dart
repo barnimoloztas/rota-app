@@ -1,4 +1,5 @@
 import 'mastery.dart';
+import 'mastery_band.dart';
 import 'topic.dart';
 
 class StudentTopicState {
@@ -6,6 +7,7 @@ class StudentTopicState {
     required this.topicId,
     required this.hasEvidence,
     required this.mastery,
+    required this.masteryBand,
     required this.lastMeaningfulEvidenceAt,
     required this.calculatedAt,
   });
@@ -23,6 +25,12 @@ class StudentTopicState {
 
   /// Current mastery estimate for the topic.
   final Mastery mastery;
+
+  /// Current semantic mastery band.
+  ///
+  /// Numeric score-to-band thresholds are calculated elsewhere
+  /// and remain configurable.
+  final MasteryBand masteryBand;
 
   /// Time of the most recent meaningful academic evidence.
   ///
