@@ -76,7 +76,6 @@ void main() {
       );
 
       expect(result.tasks, hasLength(2));
-
       expect(
         result.tasks.map((task) => task.topicId),
         ['a', 'b'],
@@ -88,8 +87,14 @@ void main() {
         tasks: [
           task(topicId: 'a', type: StudyTaskType.progress),
           task(topicId: 'b', type: StudyTaskType.repair),
-          task(topicId: 'c', type: StudyTaskType.reinforcement),
-          task(topicId: 'd', type: StudyTaskType.measurement),
+          task(
+            topicId: 'c',
+            type: StudyTaskType.reinforcement,
+          ),
+          task(
+            topicId: 'd',
+            type: StudyTaskType.measurement,
+          ),
           task(topicId: 'e', type: StudyTaskType.progress),
         ],
       );
@@ -132,7 +137,6 @@ void main() {
       );
 
       expect(result.tasks, hasLength(4));
-
       expect(
         result.tasks.map((task) => task.topicId),
         ['a', 'b', 'c', 'd'],
@@ -208,7 +212,10 @@ void main() {
 
       expect(result.tasks, hasLength(2));
       expect(result.tasks[0].topicId, 'fonksiyonlar');
-      expect(result.tasks[1].topicId, 'limit_ve_sureklilik');
+      expect(
+        result.tasks[1].topicId,
+        'limit_ve_sureklilik',
+      );
     });
 
     test(
@@ -254,6 +261,125 @@ void main() {
       },
     );
 
+    test(
+      'skips oversized normal task and selects later tasks that fit',
+      () {
+        final route = StudyRoute(
+          tasks: [
+            task(
+              topicId: 'a',
+              type: StudyTaskType.progress,
+            ),
+            task(
+              topicId: 'b',
+              type: StudyTaskType.repair,
+            ),
+            task(
+              topicId: 'c',
+              type: StudyTaskType.measurement,
+            ),
+            task(
+              topicId: 'd',
+              type: StudyTaskType.reinforcement,
+            ),
+          ],
+        );
+
+        final result = selectRouteWithinBudget(
+          route: route,
+          budget: const DailyStudyBudget(
+            availableMinutes: 60,
+          ),
+          effortEstimates: [
+            effort(
+              topicId: 'a',
+              type: StudyTaskType.progress,
+              minutes: 25,
+            ),
+            effort(
+              topicId: 'b',
+              type: StudyTaskType.repair,
+              minutes: 45,
+            ),
+            effort(
+              topicId: 'c',
+              type: StudyTaskType.measurement,
+              minutes: 20,
+            ),
+            effort(
+              topicId: 'd',
+              type: StudyTaskType.reinforcement,
+              minutes: 15,
+            ),
+          ],
+          config: const BudgetRouteSelectionConfig(
+            maxTasks: 4,
+          ),
+        );
+
+        expect(
+          result.tasks.map((task) => task.topicId),
+          ['a', 'c', 'd'],
+        );
+      },
+    );
+
+    test(
+      'skips oversized bridge-target pair and continues with later task',
+      () {
+        final route = StudyRoute(
+          tasks: [
+            task(
+              topicId: 'fonksiyonlar',
+              type: StudyTaskType.bridge,
+              sourceTopicId: 'limit_ve_sureklilik',
+            ),
+            task(
+              topicId: 'limit_ve_sureklilik',
+              type: StudyTaskType.progress,
+            ),
+            task(
+              topicId: 'trigonometri',
+              type: StudyTaskType.repair,
+            ),
+          ],
+        );
+
+        final result = selectRouteWithinBudget(
+          route: route,
+          budget: const DailyStudyBudget(
+            availableMinutes: 35,
+          ),
+          effortEstimates: [
+            effort(
+              topicId: 'fonksiyonlar',
+              type: StudyTaskType.bridge,
+              minutes: 15,
+            ),
+            effort(
+              topicId: 'limit_ve_sureklilik',
+              type: StudyTaskType.progress,
+              minutes: 30,
+            ),
+            effort(
+              topicId: 'trigonometri',
+              type: StudyTaskType.repair,
+              minutes: 25,
+            ),
+          ],
+          config: const BudgetRouteSelectionConfig(
+            maxTasks: 4,
+          ),
+        );
+
+        expect(result.tasks, hasLength(1));
+        expect(
+          result.tasks.first.topicId,
+          'trigonometri',
+        );
+      },
+    );
+
     test('missing effort estimate does not assume zero cost', () {
       final route = StudyRoute(
         tasks: [
@@ -281,8 +407,14 @@ void main() {
     test('preserves ranked route order deterministically', () {
       final route = StudyRoute(
         tasks: [
-          task(topicId: 'a', type: StudyTaskType.repair),
-          task(topicId: 'b', type: StudyTaskType.measurement),
+          task(
+            topicId: 'a',
+            type: StudyTaskType.repair,
+          ),
+          task(
+            topicId: 'b',
+            type: StudyTaskType.measurement,
+          ),
         ],
       );
 

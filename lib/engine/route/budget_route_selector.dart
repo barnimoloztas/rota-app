@@ -27,15 +27,16 @@ StudyRoute selectRouteWithinBudget({
     if (task.type == StudyTaskType.bridge) {
       final targetIndex = index + 1;
 
-      // Bridge must remain paired with its target.
       if (targetIndex >= route.tasks.length) {
-        break;
+        index += 1;
+        continue;
       }
 
       final targetTask = route.tasks[targetIndex];
 
       if (targetTask.topicId != task.sourceTopicId) {
-        break;
+        index += 1;
+        continue;
       }
 
       final bridgeMinutes = _estimatedMinutesForTask(
@@ -51,11 +52,13 @@ StudyRoute selectRouteWithinBudget({
       final pairMinutes = bridgeMinutes + targetMinutes;
 
       if (selectedTasks.length + 2 > config.maxTasks) {
-        break;
+        index += 2;
+        continue;
       }
 
       if (usedMinutes + pairMinutes > budget.availableMinutes) {
-        break;
+        index += 2;
+        continue;
       }
 
       selectedTasks
@@ -77,7 +80,8 @@ StudyRoute selectRouteWithinBudget({
     }
 
     if (usedMinutes + taskMinutes > budget.availableMinutes) {
-      break;
+      index += 1;
+      continue;
     }
 
     selectedTasks.add(task);
@@ -101,8 +105,5 @@ int _estimatedMinutesForTask({
     }
   }
 
-  // Missing effort estimate is treated conservatively.
-  //
-  // The engine should not silently assume zero cost for unknown tasks.
   return 1 << 30;
 }
