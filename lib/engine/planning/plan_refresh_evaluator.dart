@@ -1,4 +1,7 @@
 import '../../domain/plan_task_state.dart';
+import '../../domain/study_candidate.dart';
+import '../../domain/study_route.dart';
+import 'plan_task_invalidator.dart';
 
 enum PlanRefreshDecision {
   keep,
@@ -9,7 +12,7 @@ class PlanRefreshEvaluation {
   const PlanRefreshEvaluation({
     required this.task,
     required this.decision,
-    required this.invalidatedByNewData,
+    required this.invalidation,
   });
 
   final PlanTaskState task;
@@ -17,33 +20,40 @@ class PlanRefreshEvaluation {
   /// Whether refresh should keep or replace this task.
   final PlanRefreshDecision decision;
 
-  /// Whether new data made the original coach decision invalid.
-  final bool invalidatedByNewData;
+  /// Why the original study task is or is not still supported
+  /// by the refreshed candidate state.
+  final PlanTaskInvalidationResult invalidation;
 }
 
 PlanRefreshEvaluation evaluatePlanRefresh({
   required PlanTaskState task,
-  required bool invalidatedByNewData,
+  required StudyTask studyTask,
+  required Iterable<StudyCandidate> refreshedCandidates,
 }) {
+  final invalidation = evaluateTaskInvalidation(
+    task: studyTask,
+    refreshedCandidates: refreshedCandidates,
+  );
+
   if (task.isProtectedFromRefresh) {
     return PlanRefreshEvaluation(
       task: task,
       decision: PlanRefreshDecision.keep,
-      invalidatedByNewData: invalidatedByNewData,
+      invalidation: invalidation,
     );
   }
 
-  if (invalidatedByNewData) {
+  if (invalidation.isInvalidated) {
     return PlanRefreshEvaluation(
       task: task,
       decision: PlanRefreshDecision.replace,
-      invalidatedByNewData: true,
+      invalidation: invalidation,
     );
   }
 
   return PlanRefreshEvaluation(
     task: task,
     decision: PlanRefreshDecision.keep,
-    invalidatedByNewData: false,
+    invalidation: invalidation,
   );
 }
