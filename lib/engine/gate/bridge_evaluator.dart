@@ -19,8 +19,8 @@ class BridgeEvaluationResult {
   /// Null when no bridge is required or when no safe bridge can be selected.
   final TopicId? selectedBridgeTopicId;
 
-  /// True when the selected bridge candidate itself is blocked by
-  /// an untouched hard prerequisite.
+  /// True when the selected bridge candidate itself cannot be used
+  /// without violating Max Bridge Depth = 1.
   final bool blockedByNestedPrerequisite;
 
   bool get canProceedWithTarget {
@@ -67,9 +67,8 @@ BridgeEvaluationResult evaluateBridge({
 
   // v0.2 rule:
   // A target with multiple bridge-required prerequisites does not receive
-  // multiple bridges in the same route intent. For now, selection is
-  // deterministic by graph/order position. Ranking will replace this
-  // temporary selection rule later.
+  // multiple bridges in the same route intent. For now, selection remains
+  // deterministic by graph/order position.
   final selectedBridgeTopicId = bridgeCandidates.first;
 
   final bridgeGateResult = evaluatePrerequisiteGate(
@@ -80,8 +79,12 @@ BridgeEvaluationResult evaluateBridge({
   );
 
   // Max Bridge Depth = 1.
-  // If the bridge topic itself is locked, we do not create another bridge.
-  if (bridgeGateResult.outcome == GateOutcome.locked) {
+  //
+  // A bridge topic must itself be directly usable.
+  // If it is locked OR it also requires a bridge, selecting it would create
+  // a second-level bridge chain. We therefore reject it.
+  if (bridgeGateResult.outcome == GateOutcome.locked ||
+      bridgeGateResult.outcome == GateOutcome.bridgeRequired) {
     return BridgeEvaluationResult(
       targetTopicId: targetTopicId,
       gateResult: gateResult,

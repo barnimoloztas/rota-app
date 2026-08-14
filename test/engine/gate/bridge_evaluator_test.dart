@@ -123,7 +123,7 @@ void main() {
     );
 
     test(
-      'Scenario P - does not create a bridge for a bridge whose own hard prerequisite is locked',
+      'does not create a bridge when bridge topic has a locked hard prerequisite',
       () {
         final result = evaluateBridge(
           graph: tytAytMathGraph,
@@ -156,9 +156,62 @@ void main() {
           GateOutcome.bridgeRequired,
         );
 
-        // Çarpanlara Ayırma'nın hard prerequisite'i olan
-        // Üslü Sayılar snapshot'ta yoktur; dolayısıyla bridge'in
-        // kendisi locked durumundadır.
+        // Çarpanlara Ayırma'nın hard prerequisite'i Üslü Sayılar
+        // snapshot'ta yoktur. Bridge konusu bu yüzden locked durumundadır.
+        expect(result.selectedBridgeTopicId, isNull);
+        expect(result.blockedByNestedPrerequisite, isTrue);
+        expect(result.canProceedWithTarget, isFalse);
+      },
+    );
+
+    test(
+      'does not allow bridge-of-bridge when bridge topic itself requires a bridge',
+      () {
+        final result = evaluateBridge(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({
+            // Hedef: 2. Derece Denklemler/Parabol.
+            // İlk bridge adayı: Çarpanlara Ayırma.
+            'carpanlara_ayirma': state(
+              topicId: 'carpanlara_ayirma',
+              band: MasteryBand.proficient,
+              score: 82.0,
+              confidence: 0.85,
+            ),
+
+            // Diğer hard prerequisite'ler hedefi kilitlemesin.
+            'denklem_cozme': state(
+              topicId: 'denklem_cozme',
+              band: MasteryBand.consolidated,
+              score: 90.0,
+              confidence: 0.90,
+            ),
+            'fonksiyonlar': state(
+              topicId: 'fonksiyonlar',
+              band: MasteryBand.consolidated,
+              score: 91.0,
+              confidence: 0.90,
+            ),
+
+            // Çarpanlara Ayırma'nın hard prerequisite'i Üslü Sayılar.
+            // Proficient olduğu için locked değil, bridgeRequired olur.
+            // Bu durumda ikinci bir bridge üretilmemelidir.
+            'uslu_sayilar': state(
+              topicId: 'uslu_sayilar',
+              band: MasteryBand.proficient,
+              score: 84.0,
+              confidence: 0.85,
+            ),
+          }),
+          targetTopicId: 'ikinci_derece_denklemler_parabol',
+          gateConfig: gateConfig,
+        );
+
+        expect(
+          result.gateResult.outcome,
+          GateOutcome.bridgeRequired,
+        );
+
         expect(result.selectedBridgeTopicId, isNull);
         expect(result.blockedByNestedPrerequisite, isTrue);
         expect(result.canProceedWithTarget, isFalse);
@@ -205,8 +258,6 @@ void main() {
           hasLength(2),
         );
 
-        // Şimdilik seçim deterministik olarak ilk bridge adayıdır.
-        // Daha sonra Candidate Ranking bu seçimin yerini alacak.
         expect(
           result.selectedBridgeTopicId,
           'carpanlara_ayirma',
