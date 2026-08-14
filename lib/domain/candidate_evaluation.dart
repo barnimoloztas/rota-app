@@ -8,7 +8,11 @@ class CandidateEvaluation {
     required this.signalStrength,
     required this.sourceCount,
     required this.hasBridge,
-  });
+    required this.examImportance,
+  }) : assert(
+          examImportance >= 0.0 &&
+              examImportance <= 1.0,
+        );
 
   /// Topic being evaluated.
   final TopicId topicId;
@@ -29,4 +33,11 @@ class CandidateEvaluation {
 
   /// Whether the candidate requires bridge work.
   final bool hasBridge;
+
+  /// Normalized exam importance for this topic.
+  ///
+  /// Range: 0.0 - 1.0
+  ///
+  /// This is a ranking input, not a final ranking score.
+  final double examImportance;
 }

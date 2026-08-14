@@ -1,8 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/study_candidate.dart';
+import 'package:rota_app/domain/topic_exam_profile.dart';
 import 'package:rota_app/engine/candidate/candidate_aggregator.dart';
 
 void main() {
+  const examProfiles = {
+    'fonksiyonlar': TopicExamProfile(
+      topicId: 'fonksiyonlar',
+      examImportance: 0.90,
+    ),
+    'trigonometri': TopicExamProfile(
+      topicId: 'trigonometri',
+      examImportance: 0.80,
+    ),
+  };
+
   group('aggregateCandidate', () {
     test('uses strongest candidate signal as aggregated strength', () {
       const candidate = StudyCandidate(
@@ -34,12 +46,16 @@ void main() {
         ],
       );
 
-      final evaluation = aggregateCandidate(candidate);
+      final evaluation = aggregateCandidate(
+        candidate,
+        examProfilesByTopicId: examProfiles,
+      );
 
       expect(evaluation.topicId, 'fonksiyonlar');
       expect(evaluation.signalStrength, 0.80);
       expect(evaluation.sourceCount, 3);
       expect(evaluation.hasBridge, isFalse);
+      expect(evaluation.examImportance, 0.90);
       expect(evaluation.candidate, same(candidate));
     });
 
@@ -54,7 +70,10 @@ void main() {
         bridgeTopicId: null,
       );
 
-      final evaluation = aggregateCandidate(candidate);
+      final evaluation = aggregateCandidate(
+        candidate,
+        examProfilesByTopicId: examProfiles,
+      );
 
       expect(evaluation.signalStrength, 0.0);
       expect(evaluation.sourceCount, 1);
@@ -71,7 +90,10 @@ void main() {
         bridgeTopicId: 'fonksiyonlar',
       );
 
-      final evaluation = aggregateCandidate(candidate);
+      final evaluation = aggregateCandidate(
+        candidate,
+        examProfilesByTopicId: examProfiles,
+      );
 
       expect(evaluation.hasBridge, isTrue);
       expect(evaluation.candidate.bridgeTopicId, 'fonksiyonlar');
@@ -101,9 +123,32 @@ void main() {
         ],
       );
 
-      final evaluation = aggregateCandidate(candidate);
+      final evaluation = aggregateCandidate(
+        candidate,
+        examProfilesByTopicId: examProfiles,
+      );
 
       expect(evaluation.sourceCount, 2);
+      expect(evaluation.examImportance, 0.80);
+    });
+
+    test('uses zero exam importance when profile is missing', () {
+      const candidate = StudyCandidate(
+        topicId: 'integral',
+        primarySource: CandidateSource.progress,
+        sources: {
+          CandidateSource.progress,
+        },
+        requiresBridge: false,
+        bridgeTopicId: null,
+      );
+
+      final evaluation = aggregateCandidate(
+        candidate,
+        examProfilesByTopicId: examProfiles,
+      );
+
+      expect(evaluation.examImportance, 0.0);
     });
   });
 
@@ -137,8 +182,15 @@ void main() {
         ),
       ];
 
-      final first = aggregateCandidates(candidates);
-      final second = aggregateCandidates(candidates);
+      final first = aggregateCandidates(
+        candidates,
+        examProfilesByTopicId: examProfiles,
+      );
+
+      final second = aggregateCandidates(
+        candidates,
+        examProfilesByTopicId: examProfiles,
+      );
 
       expect(first, hasLength(2));
       expect(second, hasLength(2));
@@ -153,12 +205,17 @@ void main() {
           first[i].sourceCount,
           second[i].sourceCount,
         );
+        expect(
+          first[i].examImportance,
+          second[i].examImportance,
+        );
       }
     });
 
     test('can aggregate an empty candidate list', () {
       final result = aggregateCandidates(
         const <StudyCandidate>[],
+        examProfilesByTopicId: examProfiles,
       );
 
       expect(result, isEmpty);
