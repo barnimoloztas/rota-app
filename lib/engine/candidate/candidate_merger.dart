@@ -15,6 +15,7 @@ List<StudyCandidate> mergeCandidates(
         sources: Set.unmodifiable(candidate.sources),
         requiresBridge: candidate.requiresBridge,
         bridgeTopicId: candidate.bridgeTopicId,
+        signals: List.unmodifiable(candidate.signals),
       );
 
       continue;
@@ -24,6 +25,11 @@ List<StudyCandidate> mergeCandidates(
       ...existing.sources,
       ...candidate.sources,
     };
+
+    final mergedSignals = <CandidateSignal>[
+      ...existing.signals,
+      ...candidate.signals,
+    ];
 
     final mergedRequiresBridge =
         existing.requiresBridge || candidate.requiresBridge;
@@ -44,6 +50,7 @@ List<StudyCandidate> mergeCandidates(
       sources: Set.unmodifiable(mergedSources),
       requiresBridge: mergedRequiresBridge,
       bridgeTopicId: mergedBridgeTopicId,
+      signals: List.unmodifiable(mergedSignals),
     );
   }
 
@@ -66,8 +73,6 @@ String? _mergeBridgeTopicIds(
     return existingBridgeTopicId;
   }
 
-  // At this layer we do not choose between conflicting bridge topics.
-  // That requires ranking/selection logic and must not be guessed here.
   throw StateError(
     'Cannot merge candidates with different bridge topics: '
     '$existingBridgeTopicId vs $incomingBridgeTopicId',

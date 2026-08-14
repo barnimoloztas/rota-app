@@ -26,6 +26,7 @@ void main() {
           CandidateSource.progress,
         },
       );
+      expect(result.first.signals, isEmpty);
       expect(result.first.requiresBridge, isFalse);
       expect(result.first.bridgeTopicId, isNull);
     });
@@ -49,6 +50,13 @@ void main() {
         },
         requiresBridge: false,
         bridgeTopicId: null,
+        signals: [
+          CandidateSignal(
+            source: CandidateSource.repair,
+            reason: CandidateReason.lowMastery,
+            strength: 0.80,
+          ),
+        ],
       );
 
       final result = mergeCandidates([
@@ -64,6 +72,73 @@ void main() {
         containsAll({
           CandidateSource.progress,
           CandidateSource.repair,
+        }),
+      );
+
+      expect(result.first.signals, hasLength(1));
+      expect(
+        result.first.signals.first.reason,
+        CandidateReason.lowMastery,
+      );
+      expect(result.first.signals.first.strength, 0.80);
+    });
+
+    test('preserves all signals when same topic candidates are merged', () {
+      const first = StudyCandidate(
+        topicId: 'trigonometri',
+        primarySource: CandidateSource.repair,
+        sources: {
+          CandidateSource.repair,
+        },
+        requiresBridge: false,
+        bridgeTopicId: null,
+        signals: [
+          CandidateSignal(
+            source: CandidateSource.repair,
+            reason: CandidateReason.lowMastery,
+            strength: 0.65,
+          ),
+        ],
+      );
+
+      const second = StudyCandidate(
+        topicId: 'trigonometri',
+        primarySource: CandidateSource.repair,
+        sources: {
+          CandidateSource.repair,
+        },
+        requiresBridge: false,
+        bridgeTopicId: null,
+        signals: [
+          CandidateSignal(
+            source: CandidateSource.repair,
+            reason: CandidateReason.chronicWeakness,
+            strength: 0.90,
+          ),
+        ],
+      );
+
+      final result = mergeCandidates([
+        first,
+        second,
+      ]);
+
+      expect(result, hasLength(1));
+      expect(result.first.signals, hasLength(2));
+
+      expect(
+        result.first.signals.map((signal) => signal.reason),
+        containsAll({
+          CandidateReason.lowMastery,
+          CandidateReason.chronicWeakness,
+        }),
+      );
+
+      expect(
+        result.first.signals.map((signal) => signal.strength),
+        containsAll({
+          0.65,
+          0.90,
         }),
       );
     });
