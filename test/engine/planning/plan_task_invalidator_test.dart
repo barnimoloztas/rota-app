@@ -49,6 +49,33 @@ void main() {
       );
     });
 
+    test('keeps practice task valid while practice source still supports it', () {
+      const task = StudyTask(
+        topicId: 'fonksiyonlar',
+        type: StudyTaskType.practice,
+        sourceTopicId: 'fonksiyonlar',
+      );
+
+      final result = evaluateTaskInvalidation(
+        task: task,
+        refreshedCandidates: [
+          candidate(
+            topicId: 'fonksiyonlar',
+            primarySource: CandidateSource.practice,
+            sources: {
+              CandidateSource.practice,
+            },
+          ),
+        ],
+      );
+
+      expect(result.isInvalidated, isFalse);
+      expect(
+        result.reason,
+        PlanTaskInvalidationReason.stillSupported,
+      );
+    });
+
     test('invalidates task when candidate no longer exists', () {
       const task = StudyTask(
         topicId: 'turev',
@@ -85,6 +112,36 @@ void main() {
               primarySource: CandidateSource.measurement,
               sources: {
                 CandidateSource.measurement,
+              },
+            ),
+          ],
+        );
+
+        expect(result.isInvalidated, isTrue);
+        expect(
+          result.reason,
+          PlanTaskInvalidationReason.sourceNoLongerSupportsTask,
+        );
+      },
+    );
+
+    test(
+      'invalidates practice task when practice source disappears',
+      () {
+        const task = StudyTask(
+          topicId: 'fonksiyonlar',
+          type: StudyTaskType.practice,
+          sourceTopicId: 'fonksiyonlar',
+        );
+
+        final result = evaluateTaskInvalidation(
+          task: task,
+          refreshedCandidates: [
+            candidate(
+              topicId: 'fonksiyonlar',
+              primarySource: CandidateSource.reinforcement,
+              sources: {
+                CandidateSource.reinforcement,
               },
             ),
           ],

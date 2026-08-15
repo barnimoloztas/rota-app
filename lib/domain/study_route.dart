@@ -2,6 +2,7 @@ import 'topic.dart';
 
 enum StudyTaskType {
   progress,
+  practice,
   repair,
   reinforcement,
   measurement,

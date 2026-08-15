@@ -96,6 +96,9 @@ CandidateSource? _candidateSourceForTaskType(
     case StudyTaskType.progress:
       return CandidateSource.progress;
 
+    case StudyTaskType.practice:
+      return CandidateSource.practice;
+
     case StudyTaskType.repair:
       return CandidateSource.repair;
 

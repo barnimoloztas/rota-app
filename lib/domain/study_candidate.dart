@@ -2,12 +2,18 @@ import 'topic.dart';
 
 enum CandidateSource {
   progress,
+  practice,
   repair,
   reinforcement,
   measurement,
 }
 
 enum CandidateReason {
+  // Practice
+  initialPractice,
+  practiceDevelopment,
+  practiceMaintenance,
+
   // Repair
   lowMastery,
   chronicWeakness,

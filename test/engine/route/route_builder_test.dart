@@ -37,6 +37,15 @@ void main() {
           bridgeTopicId: null,
         ),
         StudyCandidate(
+          topicId: 'problemler',
+          primarySource: CandidateSource.practice,
+          sources: {
+            CandidateSource.practice,
+          },
+          requiresBridge: false,
+          bridgeTopicId: null,
+        ),
+        StudyCandidate(
           topicId: 'trigonometri',
           primarySource: CandidateSource.repair,
           sources: {
@@ -69,12 +78,13 @@ void main() {
         candidates: candidates,
       );
 
-      expect(route.tasks, hasLength(4));
+      expect(route.tasks, hasLength(5));
 
       expect(route.tasks[0].type, StudyTaskType.progress);
-      expect(route.tasks[1].type, StudyTaskType.repair);
-      expect(route.tasks[2].type, StudyTaskType.reinforcement);
-      expect(route.tasks[3].type, StudyTaskType.measurement);
+      expect(route.tasks[1].type, StudyTaskType.practice);
+      expect(route.tasks[2].type, StudyTaskType.repair);
+      expect(route.tasks[3].type, StudyTaskType.reinforcement);
+      expect(route.tasks[4].type, StudyTaskType.measurement);
     });
 
     test('places bridge task before its target task', () {

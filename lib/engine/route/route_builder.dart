@@ -46,6 +46,9 @@ StudyTaskType _taskTypeForSource(
     case CandidateSource.progress:
       return StudyTaskType.progress;
 
+    case CandidateSource.practice:
+      return StudyTaskType.practice;
+
     case CandidateSource.repair:
       return StudyTaskType.repair;
 
