@@ -1,7 +1,6 @@
 import 'topic.dart';
 
 enum ReinforcementSignalReason {
-  needsPractice,
   masteryMaintenance,
 }
 

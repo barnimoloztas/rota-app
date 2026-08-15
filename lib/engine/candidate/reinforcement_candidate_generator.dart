@@ -26,9 +26,6 @@ CandidateReason _mapReinforcementReason(
   ReinforcementSignalReason reason,
 ) {
   switch (reason) {
-    case ReinforcementSignalReason.needsPractice:
-      return CandidateReason.needsPractice;
-
     case ReinforcementSignalReason.masteryMaintenance:
       return CandidateReason.masteryMaintenance;
   }

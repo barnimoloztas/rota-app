@@ -14,7 +14,6 @@ enum CandidateReason {
   performanceDecline,
 
   // Reinforcement
-  needsPractice,
   masteryMaintenance,
 
   // Measurement

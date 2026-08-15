@@ -8,29 +8,32 @@ void main() {
     test('stores topic, reason, and strength', () {
       const signal = ReinforcementSignal(
         topicId: 'fonksiyonlar',
-        reason: ReinforcementSignalReason.needsPractice,
+        reason: ReinforcementSignalReason.masteryMaintenance,
         strength: 0.70,
       );
 
       expect(signal.topicId, 'fonksiyonlar');
-      expect(signal.reason, ReinforcementSignalReason.needsPractice);
+      expect(
+        signal.reason,
+        ReinforcementSignalReason.masteryMaintenance,
+      );
       expect(signal.strength, 0.70);
     });
   });
 
   group('generateReinforcementCandidate', () {
-    test('creates reinforcement candidate for practice need', () {
+    test('creates reinforcement candidate for mastery maintenance', () {
       const signal = ReinforcementSignal(
-        topicId: 'fonksiyonlar',
-        reason: ReinforcementSignalReason.needsPractice,
-        strength: 0.70,
+        topicId: 'turev',
+        reason: ReinforcementSignalReason.masteryMaintenance,
+        strength: 0.55,
       );
 
       final candidate = generateReinforcementCandidate(
         signal: signal,
       );
 
-      expect(candidate.topicId, 'fonksiyonlar');
+      expect(candidate.topicId, 'turev');
       expect(
         candidate.primarySource,
         CandidateSource.reinforcement,
@@ -51,30 +54,6 @@ void main() {
       );
       expect(
         candidate.signals.first.reason,
-        CandidateReason.needsPractice,
-      );
-      expect(candidate.signals.first.strength, 0.70);
-    });
-
-    test('creates reinforcement candidate for mastery maintenance', () {
-      const signal = ReinforcementSignal(
-        topicId: 'turev',
-        reason: ReinforcementSignalReason.masteryMaintenance,
-        strength: 0.55,
-      );
-
-      final candidate = generateReinforcementCandidate(
-        signal: signal,
-      );
-
-      expect(candidate.topicId, 'turev');
-      expect(
-        candidate.primarySource,
-        CandidateSource.reinforcement,
-      );
-      expect(candidate.signals, hasLength(1));
-      expect(
-        candidate.signals.first.reason,
         CandidateReason.masteryMaintenance,
       );
       expect(candidate.signals.first.strength, 0.55);
@@ -83,7 +62,7 @@ void main() {
     test('does not turn signal strength into a final ranking score', () {
       const signal = ReinforcementSignal(
         topicId: 'integral',
-        reason: ReinforcementSignalReason.needsPractice,
+        reason: ReinforcementSignalReason.masteryMaintenance,
         strength: 0.95,
       );
 
