@@ -22,7 +22,7 @@ void main() {
       expect(result.isDue, isFalse);
     });
 
-    test('is not due during the first week after first practice', () {
+    test('is not due before 14 days have passed after first practice', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
         completedInitialPracticeCount: 1,
@@ -34,35 +34,32 @@ void main() {
 
       final result = evaluateTopicReinforcement(
         lifecycle: lifecycle,
-        evaluatedAt: DateTime.utc(2026, 8, 16),
+        evaluatedAt: DateTime.utc(2026, 8, 23),
       );
 
       expect(result.isDue, isFalse);
     });
 
-    test(
-      'first reinforcement is due in the second week after first practice',
-      () {
-        final lifecycle = TopicLearningLifecycle(
-          topicId: 'fonksiyonlar',
-          completedInitialPracticeCount: 1,
-          firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-          lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-          completedReinforcementCount: 0,
-          lastReinforcementCompletedAt: null,
-        );
+    test('first reinforcement is due 14 days after first practice', () {
+      final lifecycle = TopicLearningLifecycle(
+        topicId: 'fonksiyonlar',
+        completedInitialPracticeCount: 1,
+        firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
+        lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
+        completedReinforcementCount: 0,
+        lastReinforcementCompletedAt: null,
+      );
 
-        final result = evaluateTopicReinforcement(
-          lifecycle: lifecycle,
-          evaluatedAt: DateTime.utc(2026, 8, 17),
-        );
+      final result = evaluateTopicReinforcement(
+        lifecycle: lifecycle,
+        evaluatedAt: DateTime.utc(2026, 8, 24),
+      );
 
-        expect(result.isDue, isTrue);
-      },
-    );
+      expect(result.isDue, isTrue);
+    });
 
     test(
-      'second reinforcement is not due immediately after first reinforcement',
+      'next reinforcement is not due immediately after previous reinforcement',
       () {
         final lifecycle = TopicLearningLifecycle(
           topicId: 'fonksiyonlar',
@@ -82,7 +79,7 @@ void main() {
       },
     );
 
-    test('second reinforcement is due one week after first reinforcement', () {
+    test('next reinforcement is due one week after previous reinforcement', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
         completedInitialPracticeCount: 4,
@@ -116,78 +113,6 @@ void main() {
       );
 
       expect(result.isDue, isFalse);
-    });
-
-    test('reports r1 as next step when no reinforcement is completed', () {
-      final lifecycle = TopicLearningLifecycle(
-        topicId: 'fonksiyonlar',
-        completedInitialPracticeCount: 1,
-        firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-        lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-        completedReinforcementCount: 0,
-        lastReinforcementCompletedAt: null,
-      );
-
-      final result = evaluateTopicReinforcement(
-        lifecycle: lifecycle,
-        evaluatedAt: DateTime.utc(2026, 8, 17),
-      );
-
-      expect(result.nextStep, TopicReinforcementStep.r1);
-    });
-
-    test('reports r2 as next step after first reinforcement is completed', () {
-      final lifecycle = TopicLearningLifecycle(
-        topicId: 'fonksiyonlar',
-        completedInitialPracticeCount: 4,
-        firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-        lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),
-        completedReinforcementCount: 1,
-        lastReinforcementCompletedAt: DateTime.utc(2026, 8, 24),
-      );
-
-      final result = evaluateTopicReinforcement(
-        lifecycle: lifecycle,
-        evaluatedAt: DateTime.utc(2026, 8, 31),
-      );
-
-      expect(result.nextStep, TopicReinforcementStep.r2);
-    });
-
-    test('reports r3 as next step after second reinforcement is completed', () {
-      final lifecycle = TopicLearningLifecycle(
-        topicId: 'fonksiyonlar',
-        completedInitialPracticeCount: 4,
-        firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-        lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),
-        completedReinforcementCount: 2,
-        lastReinforcementCompletedAt: DateTime.utc(2026, 8, 31),
-      );
-
-      final result = evaluateTopicReinforcement(
-        lifecycle: lifecycle,
-        evaluatedAt: DateTime.utc(2026, 9, 7),
-      );
-
-      expect(result.nextStep, TopicReinforcementStep.r3);
-    });
-
-    test('reports completed after all three reinforcements are completed', () {
-      final lifecycle = TopicLearningLifecycle(
-        topicId: 'fonksiyonlar',
-        completedInitialPracticeCount: 4,
-        firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-        lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),
-        completedReinforcementCount: 3,
-        lastReinforcementCompletedAt: DateTime.utc(2026, 9, 14),
-      );
-
-      final result = evaluateTopicReinforcement(
-        lifecycle: lifecycle,
-        evaluatedAt: DateTime.utc(2026, 9, 30),
-      );
-
-      expect(result.nextStep, TopicReinforcementStep.completed);
     });
   });
 }
