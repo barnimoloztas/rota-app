@@ -1,82 +1,82 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:rota_app/domain/mastery.dart';
-import 'package:rota_app/domain/mastery_band.dart';
 import 'package:rota_app/domain/reinforcement_signal.dart';
-import 'package:rota_app/domain/student_learning_snapshot.dart';
-import 'package:rota_app/domain/student_topic_state.dart';
+import 'package:rota_app/domain/topic.dart';
+import 'package:rota_app/domain/topic_learning_lifecycle.dart';
 import 'package:rota_app/engine/signal/reinforcement_signal_generator.dart';
 
 void main() {
-  const config = ReinforcementSignalConfig(
-    strengthByBand: {
-      MasteryBand.proficient: 0.55,
-      MasteryBand.consolidated: 0.35,
-    },
-  );
-
-  StudentTopicState state({
-    required String topicId,
-    required bool hasEvidence,
-    required MasteryBand band,
-    required double score,
-    required double confidence,
+  TopicLearningLifecycle lifecycle({
+    required TopicId topicId,
+    required int completedInitialPracticeCount,
+    required DateTime? firstPracticeCompletedAt,
+    required DateTime? lastPracticeCompletedAt,
+    required int completedReinforcementCount,
+    required DateTime? lastReinforcementCompletedAt,
   }) {
-    final calculatedAt = DateTime.utc(2026, 8, 14);
-
-    return StudentTopicState(
+    return TopicLearningLifecycle(
       topicId: topicId,
-      hasEvidence: hasEvidence,
-      mastery: Mastery(
-        score: score,
-        confidence: confidence,
-      ),
-      masteryBand: band,
-      lastMeaningfulEvidenceAt:
-          hasEvidence ? DateTime.utc(2026, 8, 13) : null,
-      calculatedAt: calculatedAt,
-    );
-  }
-
-  StudentLearningSnapshot snapshot(
-    Map<String, StudentTopicState> states,
-  ) {
-    return StudentLearningSnapshot(
-      graphVersion: '1.0.0',
-      calculatedAt: DateTime.utc(2026, 8, 14),
-      topicStates: states,
+      completedInitialPracticeCount: completedInitialPracticeCount,
+      firstPracticeCompletedAt: firstPracticeCompletedAt,
+      lastPracticeCompletedAt: lastPracticeCompletedAt,
+      completedReinforcementCount: completedReinforcementCount,
+      lastReinforcementCompletedAt: lastReinforcementCompletedAt,
     );
   }
 
   group('generateReinforcementSignals', () {
-    test('does not generate reinforcement for untouched topic', () {
+    test('does not generate reinforcement before first practice', () {
       final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'fonksiyonlar': state(
+        lifecycles: [
+          lifecycle(
             topicId: 'fonksiyonlar',
-            hasEvidence: false,
-            band: MasteryBand.notStarted,
-            score: 0.0,
-            confidence: 0.0,
+            completedInitialPracticeCount: 0,
+            firstPracticeCompletedAt: null,
+            lastPracticeCompletedAt: null,
+            completedReinforcementCount: 0,
+            lastReinforcementCompletedAt: null,
           ),
-        }),
-        config: config,
+        ],
+        evaluatedAt: DateTime.utc(2026, 8, 14),
       );
 
       expect(result, isEmpty);
     });
 
-    test('generates mastery-maintenance signal for proficient band', () {
+    test('does not generate first reinforcement before 14 days', () {
+      final firstPracticeCompletedAt = DateTime.utc(2026, 8, 1);
+
       final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'fonksiyonlar': state(
+        lifecycles: [
+          lifecycle(
             topicId: 'fonksiyonlar',
-            hasEvidence: true,
-            band: MasteryBand.proficient,
-            score: 82.0,
-            confidence: 0.80,
+            completedInitialPracticeCount: 1,
+            firstPracticeCompletedAt: firstPracticeCompletedAt,
+            lastPracticeCompletedAt: firstPracticeCompletedAt,
+            completedReinforcementCount: 0,
+            lastReinforcementCompletedAt: null,
           ),
-        }),
-        config: config,
+        ],
+        evaluatedAt: DateTime.utc(2026, 8, 14),
+      );
+
+      expect(result, isEmpty);
+    });
+
+    test('generates first reinforcement at 14 days', () {
+      final firstPracticeCompletedAt = DateTime.utc(2026, 8, 1);
+
+      final result = generateReinforcementSignals(
+        lifecycles: [
+          lifecycle(
+            topicId: 'fonksiyonlar',
+            completedInitialPracticeCount: 1,
+            firstPracticeCompletedAt: firstPracticeCompletedAt,
+            lastPracticeCompletedAt: firstPracticeCompletedAt,
+            completedReinforcementCount: 0,
+            lastReinforcementCompletedAt: null,
+          ),
+        ],
+        evaluatedAt: DateTime.utc(2026, 8, 15),
       );
 
       expect(result, hasLength(1));
@@ -85,75 +85,97 @@ void main() {
         result.first.reason,
         ReinforcementSignalReason.masteryMaintenance,
       );
-      expect(result.first.strength, 0.55);
+      expect(result.first.strength, 0.0);
     });
 
-    test('generates configured strength for consolidated band', () {
+    test(
+      'does not generate next reinforcement immediately after completion',
+      () {
+        final result = generateReinforcementSignals(
+          lifecycles: [
+            lifecycle(
+              topicId: 'fonksiyonlar',
+              completedInitialPracticeCount: 4,
+              firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
+              lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
+              completedReinforcementCount: 1,
+              lastReinforcementCompletedAt: DateTime.utc(2026, 8, 15),
+            ),
+          ],
+          evaluatedAt: DateTime.utc(2026, 8, 15),
+        );
+
+        expect(result, isEmpty);
+      },
+    );
+
+    test('generates next reinforcement 7 days after previous completion', () {
       final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'turev': state(
-            topicId: 'turev',
-            hasEvidence: true,
-            band: MasteryBand.consolidated,
-            score: 92.0,
-            confidence: 0.85,
+        lifecycles: [
+          lifecycle(
+            topicId: 'fonksiyonlar',
+            completedInitialPracticeCount: 4,
+            firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
+            lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
+            completedReinforcementCount: 1,
+            lastReinforcementCompletedAt: DateTime.utc(2026, 8, 15),
           ),
-        }),
-        config: config,
+        ],
+        evaluatedAt: DateTime.utc(2026, 8, 22),
       );
 
       expect(result, hasLength(1));
-      expect(result.first.topicId, 'turev');
-      expect(
-        result.first.reason,
-        ReinforcementSignalReason.masteryMaintenance,
-      );
-      expect(result.first.strength, 0.35);
+      expect(result.first.topicId, 'fonksiyonlar');
+      expect(result.first.strength, 0.0);
     });
 
-    test('does not generate signal for unconfigured band', () {
+    test('does not generate reinforcement after three completions', () {
       final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'integral': state(
-            topicId: 'integral',
-            hasEvidence: true,
-            band: MasteryBand.developing,
-            score: 58.0,
-            confidence: 0.70,
+        lifecycles: [
+          lifecycle(
+            topicId: 'fonksiyonlar',
+            completedInitialPracticeCount: 4,
+            firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
+            lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
+            completedReinforcementCount: 3,
+            lastReinforcementCompletedAt: DateTime.utc(2026, 8, 29),
           ),
-        }),
-        config: config,
+        ],
+        evaluatedAt: DateTime.utc(2026, 9, 20),
       );
 
       expect(result, isEmpty);
     });
 
-    test('can generate reinforcement signals for multiple topics', () {
+    test('can generate due reinforcement signals for multiple topics', () {
       final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'fonksiyonlar': state(
+        lifecycles: [
+          lifecycle(
             topicId: 'fonksiyonlar',
-            hasEvidence: true,
-            band: MasteryBand.proficient,
-            score: 82.0,
-            confidence: 0.80,
+            completedInitialPracticeCount: 1,
+            firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
+            lastPracticeCompletedAt: DateTime.utc(2026, 8, 1),
+            completedReinforcementCount: 0,
+            lastReinforcementCompletedAt: null,
           ),
-          'turev': state(
+          lifecycle(
             topicId: 'turev',
-            hasEvidence: true,
-            band: MasteryBand.consolidated,
-            score: 92.0,
-            confidence: 0.85,
+            completedInitialPracticeCount: 4,
+            firstPracticeCompletedAt: DateTime.utc(2026, 7, 20),
+            lastPracticeCompletedAt: DateTime.utc(2026, 7, 26),
+            completedReinforcementCount: 1,
+            lastReinforcementCompletedAt: DateTime.utc(2026, 8, 8),
           ),
-          'limit_ve_sureklilik': state(
-            topicId: 'limit_ve_sureklilik',
-            hasEvidence: true,
-            band: MasteryBand.learning,
-            score: 30.0,
-            confidence: 0.55,
+          lifecycle(
+            topicId: 'integral',
+            completedInitialPracticeCount: 0,
+            firstPracticeCompletedAt: null,
+            lastPracticeCompletedAt: null,
+            completedReinforcementCount: 0,
+            lastReinforcementCompletedAt: null,
           ),
-        }),
-        config: config,
+        ],
+        evaluatedAt: DateTime.utc(2026, 8, 15),
       );
 
       expect(result, hasLength(2));
@@ -165,26 +187,10 @@ void main() {
           'turev',
         }),
       );
-    });
 
-    test('does not invent needs-practice reason', () {
-      final result = generateReinforcementSignals(
-        snapshot: snapshot({
-          'trigonometri': state(
-            topicId: 'trigonometri',
-            hasEvidence: true,
-            band: MasteryBand.proficient,
-            score: 84.0,
-            confidence: 0.80,
-          ),
-        }),
-        config: config,
-      );
-
-      expect(result, hasLength(1));
       expect(
-        result.first.reason,
-        ReinforcementSignalReason.masteryMaintenance,
+        result.every((signal) => signal.strength == 0.0),
+        isTrue,
       );
     });
   });
