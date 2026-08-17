@@ -1,8 +1,11 @@
+import '../../domain/selected_mode.dart';
 import '../../domain/study_candidate.dart';
 import '../../domain/study_route.dart';
+import '../practice/practice_question_target_policy.dart';
 
 StudyRoute buildRoute({
   required List<StudyCandidate> candidates,
+  required SelectedMode selectedMode,
 }) {
   final tasks = <StudyTask>[];
 
@@ -25,11 +28,16 @@ StudyRoute buildRoute({
       }
     }
 
+    final taskType = _taskTypeForSource(candidate.primarySource);
+
     tasks.add(
       StudyTask(
         topicId: candidate.topicId,
-        type: _taskTypeForSource(candidate.primarySource),
+        type: taskType,
         sourceTopicId: candidate.topicId,
+        questionTarget: taskType == StudyTaskType.practice
+            ? practiceQuestionTargetForMode(selectedMode)
+            : null,
       ),
     );
   }

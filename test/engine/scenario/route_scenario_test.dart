@@ -3,6 +3,7 @@ import 'package:rota_app/domain/mastery.dart';
 import 'package:rota_app/domain/mastery_band.dart';
 import 'package:rota_app/domain/measurement_signal.dart';
 import 'package:rota_app/domain/repair_signal.dart';
+import 'package:rota_app/domain/selected_mode.dart';
 import 'package:rota_app/domain/student_learning_snapshot.dart';
 import 'package:rota_app/domain/student_topic_state.dart';
 import 'package:rota_app/engine/candidate/candidate_generator.dart';
@@ -86,6 +87,7 @@ void main() {
 
         final route = buildRoute(
           candidates: candidates,
+          selectedMode: SelectedMode.balanced,
         );
 
         final selected = selectRouteTasks(
@@ -134,6 +136,7 @@ void main() {
 
         final route = buildRoute(
           candidates: candidates,
+          selectedMode: SelectedMode.balanced,
         );
 
         final selected = selectRouteTasks(
@@ -197,6 +200,7 @@ void main() {
 
         final route = buildRoute(
           candidates: candidates,
+          selectedMode: SelectedMode.balanced,
         );
 
         final selected = selectRouteTasks(
@@ -245,6 +249,7 @@ void main() {
 
         final route = buildRoute(
           candidates: candidates,
+          selectedMode: SelectedMode.balanced,
         );
 
         final selected = selectRouteTasks(
@@ -255,19 +260,16 @@ void main() {
         );
 
         expect(
-          selected.tasks
-              .any(
-                (task) =>
-                    task.topicId == 'limit_ve_sureklilik',
-              ),
+          selected.tasks.any(
+            (task) => task.topicId == 'limit_ve_sureklilik',
+          ),
           isFalse,
         );
 
         expect(
-          selected.tasks
-              .any(
-                (task) => task.topicId == 'trigonometri',
-              ),
+          selected.tasks.any(
+            (task) => task.topicId == 'trigonometri',
+          ),
           isTrue,
         );
       },

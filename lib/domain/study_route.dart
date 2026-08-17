@@ -14,6 +14,7 @@ class StudyTask {
     required this.topicId,
     required this.type,
     required this.sourceTopicId,
+    this.questionTarget,
   });
 
   /// Topic the student will actually work on.
@@ -28,6 +29,11 @@ class StudyTask {
   /// For a bridge task this is the locked target topic whose
   /// prerequisite created the bridge.
   final TopicId sourceTopicId;
+
+  /// Question target for this task when applicable.
+  ///
+  /// In the current MVP this is used only for Practice tasks.
+  final int? questionTarget;
 }
 
 class StudyRoute {

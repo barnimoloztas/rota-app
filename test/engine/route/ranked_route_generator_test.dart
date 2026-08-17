@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rota_app/domain/selected_mode.dart';
 import 'package:rota_app/domain/study_candidate.dart';
 import 'package:rota_app/domain/topic_exam_profile.dart';
 import 'package:rota_app/engine/ranking/candidate_ranker.dart';
@@ -60,6 +61,7 @@ void main() {
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
           routeSelectionConfig: routeSelectionConfig,
+          selectedMode: SelectedMode.balanced,
         ),
       );
 
@@ -119,6 +121,7 @@ void main() {
           },
           rankingConfig: rankingConfig,
           routeSelectionConfig: routeSelectionConfig,
+          selectedMode: SelectedMode.balanced,
         ),
       );
 
@@ -168,6 +171,7 @@ void main() {
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
           routeSelectionConfig: routeSelectionConfig,
+          selectedMode: SelectedMode.balanced,
         ),
       );
 
@@ -264,6 +268,7 @@ void main() {
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
           routeSelectionConfig: routeSelectionConfig,
+          selectedMode: SelectedMode.balanced,
         ),
       );
 
@@ -319,6 +324,7 @@ void main() {
           routeSelectionConfig: RouteSelectionConfig(
             maxTasks: 2,
           ),
+          selectedMode: SelectedMode.balanced,
         ),
       );
 
@@ -366,6 +372,7 @@ void main() {
         examProfilesByTopicId: {},
         rankingConfig: rankingConfig,
         routeSelectionConfig: routeSelectionConfig,
+        selectedMode: SelectedMode.balanced,
       );
 
       final first = generateRankedRoute(input);

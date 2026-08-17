@@ -1,3 +1,4 @@
+import '../../domain/selected_mode.dart';
 import '../../domain/study_candidate.dart';
 import '../../domain/study_route.dart';
 import '../../domain/topic_exam_profile.dart';
@@ -12,6 +13,7 @@ class RankedRouteGenerationInput {
     required this.examProfilesByTopicId,
     required this.rankingConfig,
     required this.routeSelectionConfig,
+    required this.selectedMode,
   });
 
   final List<StudyCandidate> candidates;
@@ -21,6 +23,8 @@ class RankedRouteGenerationInput {
   final RankingConfig rankingConfig;
 
   final RouteSelectionConfig routeSelectionConfig;
+
+  final SelectedMode selectedMode;
 }
 
 StudyRoute generateRankedRoute(
@@ -44,6 +48,7 @@ StudyRoute generateRankedRoute(
 
   final route = buildRoute(
     candidates: orderedCandidates,
+    selectedMode: input.selectedMode,
   );
 
   return selectRouteTasks(

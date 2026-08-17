@@ -13,6 +13,20 @@ void main() {
       expect(task.topicId, 'fonksiyonlar');
       expect(task.type, StudyTaskType.progress);
       expect(task.sourceTopicId, 'fonksiyonlar');
+      expect(task.questionTarget, isNull);
+    });
+
+    test('stores practice question target', () {
+      const task = StudyTask(
+        topicId: 'fonksiyonlar',
+        type: StudyTaskType.practice,
+        sourceTopicId: 'fonksiyonlar',
+        questionTarget: 40,
+      );
+
+      expect(task.topicId, 'fonksiyonlar');
+      expect(task.type, StudyTaskType.practice);
+      expect(task.questionTarget, 40);
     });
 
     test('stores a bridge task with a different source topic', () {
@@ -25,6 +39,7 @@ void main() {
       expect(task.topicId, 'fonksiyonlar');
       expect(task.type, StudyTaskType.bridge);
       expect(task.sourceTopicId, 'limit_ve_sureklilik');
+      expect(task.questionTarget, isNull);
     });
   });
 
