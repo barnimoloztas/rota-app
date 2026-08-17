@@ -187,9 +187,9 @@ void main() {
 
       const second = StudyCandidate(
         topicId: 'limit_ve_sureklilik',
-        primarySource: CandidateSource.reinforcement,
+        primarySource: CandidateSource.repair,
         sources: {
-          CandidateSource.reinforcement,
+          CandidateSource.repair,
         },
         requiresBridge: true,
         bridgeTopicId: 'fonksiyonlar',
@@ -207,7 +207,7 @@ void main() {
         result.first.sources,
         containsAll({
           CandidateSource.progress,
-          CandidateSource.reinforcement,
+          CandidateSource.repair,
         }),
       );
     });

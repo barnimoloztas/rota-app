@@ -19,7 +19,7 @@ void main() {
           ),
           StudyTask(
             topicId: 'c',
-            type: StudyTaskType.reinforcement,
+            type: StudyTaskType.practice,
             sourceTopicId: 'c',
           ),
           StudyTask(
@@ -64,7 +64,7 @@ void main() {
           ),
           StudyTask(
             topicId: 'c',
-            type: StudyTaskType.reinforcement,
+            type: StudyTaskType.practice,
             sourceTopicId: 'c',
           ),
         ],

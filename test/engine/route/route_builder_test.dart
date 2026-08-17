@@ -86,26 +86,6 @@ void main() {
       expect(route.tasks.single.questionTarget, 60);
     });
 
-    test('assigns 15 questions to reinforcement', () {
-      const candidate = StudyCandidate(
-        topicId: 'turev',
-        primarySource: CandidateSource.reinforcement,
-        sources: {
-          CandidateSource.reinforcement,
-        },
-        requiresBridge: false,
-        bridgeTopicId: null,
-      );
-
-      final route = buildRoute(
-        candidates: const [candidate],
-        selectedMode: SelectedMode.strict,
-      );
-
-      expect(route.tasks.single.type, StudyTaskType.reinforcement);
-      expect(route.tasks.single.questionTarget, 15);
-    });
-
     test('converts all candidate source types into matching task types', () {
       const candidates = [
         StudyCandidate(
@@ -136,15 +116,6 @@ void main() {
           bridgeTopicId: null,
         ),
         StudyCandidate(
-          topicId: 'turev',
-          primarySource: CandidateSource.reinforcement,
-          sources: {
-            CandidateSource.reinforcement,
-          },
-          requiresBridge: false,
-          bridgeTopicId: null,
-        ),
-        StudyCandidate(
           topicId: 'integral',
           primarySource: CandidateSource.measurement,
           sources: {
@@ -160,7 +131,7 @@ void main() {
         selectedMode: SelectedMode.balanced,
       );
 
-      expect(route.tasks, hasLength(5));
+      expect(route.tasks, hasLength(4));
 
       expect(route.tasks[0].type, StudyTaskType.progress);
       expect(route.tasks[0].questionTarget, isNull);
@@ -171,11 +142,8 @@ void main() {
       expect(route.tasks[2].type, StudyTaskType.repair);
       expect(route.tasks[2].questionTarget, isNull);
 
-      expect(route.tasks[3].type, StudyTaskType.reinforcement);
-      expect(route.tasks[3].questionTarget, 15);
-
-      expect(route.tasks[4].type, StudyTaskType.measurement);
-      expect(route.tasks[4].questionTarget, isNull);
+      expect(route.tasks[3].type, StudyTaskType.measurement);
+      expect(route.tasks[3].questionTarget, isNull);
     });
 
     test('places bridge task before its target task', () {

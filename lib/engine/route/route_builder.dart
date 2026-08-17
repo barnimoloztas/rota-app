@@ -9,8 +9,6 @@ StudyRoute buildRoute({
 }) {
   final tasks = <StudyTask>[];
 
-  // Aynı prerequisite bridge birden fazla hedef tarafından istenirse
-  // yalnızca bir kez görünür task üretmek için kullanılır.
   final addedBridgeTopicIds = <String>{};
 
   for (final candidate in candidates) {
@@ -56,9 +54,6 @@ int? _questionTargetForTask({
     case StudyTaskType.practice:
       return practiceQuestionTargetForMode(selectedMode);
 
-    case StudyTaskType.reinforcement:
-      return 15;
-
     case StudyTaskType.progress:
     case StudyTaskType.repair:
     case StudyTaskType.measurement:
@@ -79,9 +74,6 @@ StudyTaskType _taskTypeForSource(
 
     case CandidateSource.repair:
       return StudyTaskType.repair;
-
-    case CandidateSource.reinforcement:
-      return StudyTaskType.reinforcement;
 
     case CandidateSource.measurement:
       return StudyTaskType.measurement;

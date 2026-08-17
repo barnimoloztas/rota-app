@@ -23,7 +23,6 @@ void main() {
         sources: {
           CandidateSource.repair,
           CandidateSource.measurement,
-          CandidateSource.reinforcement,
         },
         requiresBridge: false,
         bridgeTopicId: null,
@@ -38,11 +37,6 @@ void main() {
             reason: CandidateReason.lowConfidence,
             strength: 0.65,
           ),
-          CandidateSignal(
-            source: CandidateSource.reinforcement,
-            reason: CandidateReason.masteryMaintenance,
-            strength: 0.45,
-          ),
         ],
       );
 
@@ -53,7 +47,7 @@ void main() {
 
       expect(evaluation.topicId, 'fonksiyonlar');
       expect(evaluation.signalStrength, 0.80);
-      expect(evaluation.sourceCount, 3);
+      expect(evaluation.sourceCount, 2);
       expect(evaluation.hasBridge, isFalse);
       expect(evaluation.examImportance, 0.90);
       expect(evaluation.candidate, same(candidate));

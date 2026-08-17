@@ -139,9 +139,9 @@ void main() {
           refreshedCandidates: [
             candidate(
               topicId: 'fonksiyonlar',
-              primarySource: CandidateSource.reinforcement,
+              primarySource: CandidateSource.measurement,
               sources: {
-                CandidateSource.reinforcement,
+                CandidateSource.measurement,
               },
             ),
           ],

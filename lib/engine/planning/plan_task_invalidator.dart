@@ -102,9 +102,6 @@ CandidateSource? _candidateSourceForTaskType(
     case StudyTaskType.repair:
       return CandidateSource.repair;
 
-    case StudyTaskType.reinforcement:
-      return CandidateSource.reinforcement;
-
     case StudyTaskType.measurement:
       return CandidateSource.measurement;
 

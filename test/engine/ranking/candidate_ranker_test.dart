@@ -128,8 +128,8 @@ void main() {
             primarySource: CandidateSource.repair,
             sources: {
               CandidateSource.progress,
+              CandidateSource.practice,
               CandidateSource.repair,
-              CandidateSource.reinforcement,
               CandidateSource.measurement,
             },
             signalStrength: 0.60,
@@ -216,7 +216,7 @@ void main() {
           sources: {
             CandidateSource.repair,
             CandidateSource.measurement,
-            CandidateSource.reinforcement,
+            CandidateSource.practice,
           },
           signalStrength: 0.80,
           examImportance: 0.90,
@@ -291,43 +291,6 @@ void main() {
         expect(
           ranked.first.evaluation.topicId,
           'measurement_topic',
-        );
-      },
-    );
-
-    test(
-      'preExam favors reinforcement over otherwise equal progress candidate',
-      () {
-        final ranked = rankCandidates(
-          evaluations: [
-            evaluation(
-              topicId: 'progress_topic',
-              primarySource: CandidateSource.progress,
-              sources: {
-                CandidateSource.progress,
-              },
-              signalStrength: 0.60,
-              examImportance: 0.60,
-              hasBridge: false,
-            ),
-            evaluation(
-              topicId: 'reinforcement_topic',
-              primarySource: CandidateSource.reinforcement,
-              sources: {
-                CandidateSource.reinforcement,
-              },
-              signalStrength: 0.60,
-              examImportance: 0.60,
-              hasBridge: false,
-            ),
-          ],
-          config: modeAwareConfig,
-          planningMode: PlanningMode.preExam,
-        );
-
-        expect(
-          ranked.first.evaluation.topicId,
-          'reinforcement_topic',
         );
       },
     );

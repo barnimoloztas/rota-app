@@ -142,7 +142,7 @@ void main() {
         ),
         StudyTask(
           topicId: 'b',
-          type: StudyTaskType.reinforcement,
+          type: StudyTaskType.progress,
           sourceTopicId: 'b',
         ),
       ];

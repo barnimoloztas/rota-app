@@ -34,7 +34,7 @@ void main() {
     });
 
     test(
-      'preExam emphasizes measurement and reinforcement',
+      'preExam emphasizes measurement',
       () {
         final policy = planningModePolicyFor(
           PlanningMode.preExam,
@@ -42,10 +42,9 @@ void main() {
 
         expect(
           policy.emphasizedSources,
-          containsAll({
+          {
             CandidateSource.measurement,
-            CandidateSource.reinforcement,
-          }),
+          },
         );
       },
     );
