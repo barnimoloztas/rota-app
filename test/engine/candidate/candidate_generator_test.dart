@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/mastery.dart';
 import 'package:rota_app/domain/mastery_band.dart';
 import 'package:rota_app/domain/measurement_signal.dart';
-import 'package:rota_app/domain/reinforcement_signal.dart';
 import 'package:rota_app/domain/repair_signal.dart';
 import 'package:rota_app/domain/student_learning_snapshot.dart';
 import 'package:rota_app/domain/student_topic_state.dart';
@@ -48,7 +47,7 @@ void main() {
   }
 
   group('generateCandidates', () {
-    test('combines progress repair reinforcement and measurement candidates', () {
+    test('combines progress repair and measurement candidates', () {
       final result = generateCandidates(
         CandidateGenerationInput(
           graph: tytAytMathGraph,
@@ -70,13 +69,6 @@ void main() {
               strength: 0.90,
             ),
           ],
-          reinforcementSignals: const [
-            ReinforcementSignal(
-              topicId: 'turev',
-              reason: ReinforcementSignalReason.masteryMaintenance,
-              strength: 0.40,
-            ),
-          ],
           measurementSignals: const [
             MeasurementSignal(
               topicId: 'integral',
@@ -88,14 +80,13 @@ void main() {
         ),
       );
 
-      expect(result, hasLength(4));
+      expect(result, hasLength(3));
 
       expect(
         result.map((candidate) => candidate.topicId),
         containsAll({
           'limit_ve_sureklilik',
           'trigonometri',
-          'turev',
           'integral',
         }),
       );
@@ -110,7 +101,6 @@ void main() {
             'limit_ve_sureklilik',
           ],
           repairSignals: const [],
-          reinforcementSignals: const [],
           measurementSignals: const [],
           gateConfig: gateConfig,
         ),
@@ -141,13 +131,6 @@ void main() {
               strength: 0.80,
             ),
           ],
-          reinforcementSignals: const [
-            ReinforcementSignal(
-              topicId: 'limit_ve_sureklilik',
-              reason: ReinforcementSignalReason.masteryMaintenance,
-              strength: 0.45,
-            ),
-          ],
           measurementSignals: const [
             MeasurementSignal(
               topicId: 'limit_ve_sureklilik',
@@ -170,18 +153,16 @@ void main() {
         containsAll({
           CandidateSource.progress,
           CandidateSource.repair,
-          CandidateSource.reinforcement,
           CandidateSource.measurement,
         }),
       );
 
-      expect(candidate.signals, hasLength(3));
+      expect(candidate.signals, hasLength(2));
 
       expect(
         candidate.signals.map((signal) => signal.reason),
         containsAll({
           CandidateReason.lowMastery,
-          CandidateReason.masteryMaintenance,
           CandidateReason.lowConfidence,
         }),
       );
@@ -209,7 +190,6 @@ void main() {
               strength: 0.70,
             ),
           ],
-          reinforcementSignals: const [],
           measurementSignals: const [],
           gateConfig: gateConfig,
         ),
@@ -252,7 +232,6 @@ void main() {
             strength: 0.80,
           ),
         ],
-        reinforcementSignals: const [],
         measurementSignals: const [],
         gateConfig: gateConfig,
       );

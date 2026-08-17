@@ -73,7 +73,6 @@ void main() {
                 strength: 0.90,
               ),
             ],
-            reinforcementSignals: const [],
             measurementSignals: const [
               MeasurementSignal(
                 topicId: 'integral',
@@ -110,169 +109,155 @@ void main() {
       },
     );
 
-    test(
-      'weak prerequisite creates bridge before target',
-      () {
-        final candidates = generateCandidates(
-          CandidateGenerationInput(
-            graph: tytAytMathGraph,
-            snapshot: snapshot({
-              'fonksiyonlar': state(
-                topicId: 'fonksiyonlar',
-                band: MasteryBand.proficient,
-                score: 84.0,
-                confidence: 0.85,
-              ),
-            }),
-            progressTargetTopicIds: const [
-              'limit_ve_sureklilik',
-            ],
-            repairSignals: const [],
-            reinforcementSignals: const [],
-            measurementSignals: const [],
-            gateConfig: gateConfig,
-          ),
-        );
+    test('weak prerequisite creates bridge before target', () {
+      final candidates = generateCandidates(
+        CandidateGenerationInput(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({
+            'fonksiyonlar': state(
+              topicId: 'fonksiyonlar',
+              band: MasteryBand.proficient,
+              score: 84.0,
+              confidence: 0.85,
+            ),
+          }),
+          progressTargetTopicIds: const [
+            'limit_ve_sureklilik',
+          ],
+          repairSignals: const [],
+          measurementSignals: const [],
+          gateConfig: gateConfig,
+        ),
+      );
 
-        final route = buildRoute(
-          candidates: candidates,
-          selectedMode: SelectedMode.balanced,
-        );
+      final route = buildRoute(
+        candidates: candidates,
+        selectedMode: SelectedMode.balanced,
+      );
 
-        final selected = selectRouteTasks(
-          route: route,
-          config: const RouteSelectionConfig(
-            maxTasks: 4,
-          ),
-        );
+      final selected = selectRouteTasks(
+        route: route,
+        config: const RouteSelectionConfig(
+          maxTasks: 4,
+        ),
+      );
 
-        expect(selected.tasks, hasLength(2));
+      expect(selected.tasks, hasLength(2));
 
-        expect(selected.tasks[0].topicId, 'fonksiyonlar');
-        expect(selected.tasks[0].type.name, 'bridge');
+      expect(selected.tasks[0].topicId, 'fonksiyonlar');
+      expect(selected.tasks[0].type.name, 'bridge');
 
-        expect(
-          selected.tasks[1].topicId,
-          'limit_ve_sureklilik',
-        );
-      },
-    );
+      expect(
+        selected.tasks[1].topicId,
+        'limit_ve_sureklilik',
+      );
+    });
 
-    test(
-      'four-task ceiling keeps bridge and target together',
-      () {
-        final candidates = generateCandidates(
-          CandidateGenerationInput(
-            graph: tytAytMathGraph,
-            snapshot: snapshot({
-              'fonksiyonlar': state(
-                topicId: 'fonksiyonlar',
-                band: MasteryBand.proficient,
-                score: 84.0,
-                confidence: 0.85,
-              ),
-            }),
-            progressTargetTopicIds: const [
-              'limit_ve_sureklilik',
-            ],
-            repairSignals: const [
-              RepairSignal(
-                topicId: 'trigonometri',
-                reason: RepairSignalReason.lowMastery,
-                strength: 0.90,
-              ),
-              RepairSignal(
-                topicId: 'turev',
-                reason: RepairSignalReason.lowMastery,
-                strength: 0.80,
-              ),
-              RepairSignal(
-                topicId: 'integral',
-                reason: RepairSignalReason.lowMastery,
-                strength: 0.75,
-              ),
-            ],
-            reinforcementSignals: const [],
-            measurementSignals: const [],
-            gateConfig: gateConfig,
-          ),
-        );
+    test('four-task ceiling keeps bridge and target together', () {
+      final candidates = generateCandidates(
+        CandidateGenerationInput(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({
+            'fonksiyonlar': state(
+              topicId: 'fonksiyonlar',
+              band: MasteryBand.proficient,
+              score: 84.0,
+              confidence: 0.85,
+            ),
+          }),
+          progressTargetTopicIds: const [
+            'limit_ve_sureklilik',
+          ],
+          repairSignals: const [
+            RepairSignal(
+              topicId: 'trigonometri',
+              reason: RepairSignalReason.lowMastery,
+              strength: 0.90,
+            ),
+            RepairSignal(
+              topicId: 'turev',
+              reason: RepairSignalReason.lowMastery,
+              strength: 0.80,
+            ),
+            RepairSignal(
+              topicId: 'integral',
+              reason: RepairSignalReason.lowMastery,
+              strength: 0.75,
+            ),
+          ],
+          measurementSignals: const [],
+          gateConfig: gateConfig,
+        ),
+      );
 
-        final route = buildRoute(
-          candidates: candidates,
-          selectedMode: SelectedMode.balanced,
-        );
+      final route = buildRoute(
+        candidates: candidates,
+        selectedMode: SelectedMode.balanced,
+      );
 
-        final selected = selectRouteTasks(
-          route: route,
-          config: const RouteSelectionConfig(
-            maxTasks: 4,
-          ),
-        );
+      final selected = selectRouteTasks(
+        route: route,
+        config: const RouteSelectionConfig(
+          maxTasks: 4,
+        ),
+      );
 
-        expect(selected.tasks, hasLength(4));
+      expect(selected.tasks, hasLength(4));
 
-        expect(selected.tasks[0].topicId, 'fonksiyonlar');
-        expect(selected.tasks[1].topicId, 'limit_ve_sureklilik');
+      expect(selected.tasks[0].topicId, 'fonksiyonlar');
+      expect(selected.tasks[1].topicId, 'limit_ve_sureklilik');
 
-        expect(
-          selected.tasks
-              .where((task) => task.type.name == 'bridge')
-              .length,
-          1,
-        );
-      },
-    );
+      expect(
+        selected.tasks.where((task) => task.type.name == 'bridge').length,
+        1,
+      );
+    });
 
-    test(
-      'locked prerequisite removes progress target from final route',
-      () {
-        final candidates = generateCandidates(
-          CandidateGenerationInput(
-            graph: tytAytMathGraph,
-            snapshot: snapshot({}),
-            progressTargetTopicIds: const [
-              'limit_ve_sureklilik',
-            ],
-            repairSignals: const [
-              RepairSignal(
-                topicId: 'trigonometri',
-                reason: RepairSignalReason.lowMastery,
-                strength: 0.90,
-              ),
-            ],
-            reinforcementSignals: const [],
-            measurementSignals: const [],
-            gateConfig: gateConfig,
-          ),
-        );
+    test('locked prerequisite removes progress target from final route', () {
+      final candidates = generateCandidates(
+        CandidateGenerationInput(
+          graph: tytAytMathGraph,
+          snapshot: snapshot({}),
+          progressTargetTopicIds: const [
+            'limit_ve_sureklilik',
+          ],
+          repairSignals: const [
+            RepairSignal(
+              topicId: 'trigonometri',
+              reason: RepairSignalReason.lowMastery,
+              strength: 0.90,
+            ),
+          ],
+          measurementSignals: const [],
+          gateConfig: gateConfig,
+        ),
+      );
 
-        final route = buildRoute(
-          candidates: candidates,
-          selectedMode: SelectedMode.balanced,
-        );
+      final route = buildRoute(
+        candidates: candidates,
+        selectedMode: SelectedMode.balanced,
+      );
 
-        final selected = selectRouteTasks(
-          route: route,
-          config: const RouteSelectionConfig(
-            maxTasks: 4,
-          ),
-        );
+      final selected = selectRouteTasks(
+        route: route,
+        config: const RouteSelectionConfig(
+          maxTasks: 4,
+        ),
+      );
 
-        expect(
-          selected.tasks.any(
-            (task) => task.topicId == 'limit_ve_sureklilik',
-          ),
-          isFalse,
-        );
+      expect(
+        selected.tasks.any(
+          (task) => task.topicId == 'limit_ve_sureklilik',
+        ),
+        isFalse,
+      );
 
-        expect(
-          selected.tasks.any(
-            (task) => task.topicId == 'trigonometri',
-          ),
-          isTrue,
-        );
-      },
-    );
+      expect(
+        selected.tasks.any(
+          (task) => task.topicId == 'trigonometri',
+        ),
+        isTrue,
+      );
+    });
   });
 }
