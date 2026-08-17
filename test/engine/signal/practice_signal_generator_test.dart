@@ -12,15 +12,13 @@ void main() {
     required DateTime? firstPracticeCompletedAt,
     required DateTime? lastPracticeCompletedAt,
   }) {
-    return TopicLearningLifecycle(
-      topicId: topicId,
-      progressCompletedAt: progressCompletedAt,
-      completedInitialPracticeCount: completedInitialPracticeCount,
-      firstPracticeCompletedAt: firstPracticeCompletedAt,
-      lastPracticeCompletedAt: lastPracticeCompletedAt,
-      completedReinforcementCount: 0,
-      lastReinforcementCompletedAt: null,
-    );
+return TopicLearningLifecycle(
+  topicId: topicId,
+  progressCompletedAt: progressCompletedAt,
+  completedInitialPracticeCount: completedInitialPracticeCount,
+  firstPracticeCompletedAt: firstPracticeCompletedAt,
+  lastPracticeCompletedAt: lastPracticeCompletedAt,
+);
   }
 
   group('generatePracticeSignals', () {

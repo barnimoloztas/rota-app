@@ -16,8 +16,6 @@ void main() {
           completedInitialPracticeCount: 0,
           firstPracticeCompletedAt: null,
           lastPracticeCompletedAt: null,
-          completedReinforcementCount: 0,
-          lastReinforcementCompletedAt: null,
         );
 
         topicLifecycle = completePractice(

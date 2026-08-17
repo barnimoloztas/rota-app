@@ -16,8 +16,6 @@ void main() {
           completedInitialPracticeCount: 0,
           firstPracticeCompletedAt: null,
           lastPracticeCompletedAt: null,
-          completedReinforcementCount: 0,
-          lastReinforcementCompletedAt: null,
         );
 
         final signals = generatePracticeSignals(
@@ -59,8 +57,6 @@ void main() {
           completedInitialPracticeCount: 2,
           firstPracticeCompletedAt: DateTime.utc(2026, 8, 8),
           lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
-          completedReinforcementCount: 0,
-          lastReinforcementCompletedAt: null,
         );
 
         final signals = generatePracticeSignals(

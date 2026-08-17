@@ -22,9 +22,5 @@ TopicLearningLifecycle completePractice({
         ? completedAt
         : lifecycle.firstPracticeCompletedAt,
     lastPracticeCompletedAt: completedAt,
-    completedReinforcementCount:
-        lifecycle.completedReinforcementCount,
-    lastReinforcementCompletedAt:
-        lifecycle.lastReinforcementCompletedAt,
   );
 }
