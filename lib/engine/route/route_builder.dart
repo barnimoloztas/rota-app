@@ -35,9 +35,10 @@ StudyRoute buildRoute({
         topicId: candidate.topicId,
         type: taskType,
         sourceTopicId: candidate.topicId,
-        questionTarget: taskType == StudyTaskType.practice
-            ? practiceQuestionTargetForMode(selectedMode)
-            : null,
+        questionTarget: _questionTargetForTask(
+          taskType: taskType,
+          selectedMode: selectedMode,
+        ),
       ),
     );
   }
@@ -45,6 +46,25 @@ StudyRoute buildRoute({
   return StudyRoute(
     tasks: List.unmodifiable(tasks),
   );
+}
+
+int? _questionTargetForTask({
+  required StudyTaskType taskType,
+  required SelectedMode selectedMode,
+}) {
+  switch (taskType) {
+    case StudyTaskType.practice:
+      return practiceQuestionTargetForMode(selectedMode);
+
+    case StudyTaskType.reinforcement:
+      return 15;
+
+    case StudyTaskType.progress:
+    case StudyTaskType.repair:
+    case StudyTaskType.measurement:
+    case StudyTaskType.bridge:
+      return null;
+  }
 }
 
 StudyTaskType _taskTypeForSource(
