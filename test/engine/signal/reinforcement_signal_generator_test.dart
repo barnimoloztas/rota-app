@@ -7,6 +7,7 @@ import 'package:rota_app/engine/signal/reinforcement_signal_generator.dart';
 void main() {
   TopicLearningLifecycle lifecycle({
     required TopicId topicId,
+    required DateTime? progressCompletedAt,
     required int completedInitialPracticeCount,
     required DateTime? firstPracticeCompletedAt,
     required DateTime? lastPracticeCompletedAt,
@@ -15,6 +16,7 @@ void main() {
   }) {
     return TopicLearningLifecycle(
       topicId: topicId,
+      progressCompletedAt: progressCompletedAt,
       completedInitialPracticeCount: completedInitialPracticeCount,
       firstPracticeCompletedAt: firstPracticeCompletedAt,
       lastPracticeCompletedAt: lastPracticeCompletedAt,
@@ -29,6 +31,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 8, 1),
             completedInitialPracticeCount: 0,
             firstPracticeCompletedAt: null,
             lastPracticeCompletedAt: null,
@@ -49,6 +52,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 7, 31),
             completedInitialPracticeCount: 1,
             firstPracticeCompletedAt: firstPracticeCompletedAt,
             lastPracticeCompletedAt: firstPracticeCompletedAt,
@@ -69,6 +73,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 7, 31),
             completedInitialPracticeCount: 1,
             firstPracticeCompletedAt: firstPracticeCompletedAt,
             lastPracticeCompletedAt: firstPracticeCompletedAt,
@@ -95,6 +100,7 @@ void main() {
           lifecycles: [
             lifecycle(
               topicId: 'fonksiyonlar',
+              progressCompletedAt: DateTime.utc(2026, 7, 31),
               completedInitialPracticeCount: 4,
               firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
               lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
@@ -114,6 +120,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 7, 31),
             completedInitialPracticeCount: 4,
             firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
             lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
@@ -134,6 +141,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 7, 31),
             completedInitialPracticeCount: 4,
             firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
             lastPracticeCompletedAt: DateTime.utc(2026, 8, 7),
@@ -152,6 +160,7 @@ void main() {
         lifecycles: [
           lifecycle(
             topicId: 'fonksiyonlar',
+            progressCompletedAt: DateTime.utc(2026, 7, 31),
             completedInitialPracticeCount: 1,
             firstPracticeCompletedAt: DateTime.utc(2026, 8, 1),
             lastPracticeCompletedAt: DateTime.utc(2026, 8, 1),
@@ -160,6 +169,7 @@ void main() {
           ),
           lifecycle(
             topicId: 'turev',
+            progressCompletedAt: DateTime.utc(2026, 7, 19),
             completedInitialPracticeCount: 4,
             firstPracticeCompletedAt: DateTime.utc(2026, 7, 20),
             lastPracticeCompletedAt: DateTime.utc(2026, 7, 26),
@@ -168,6 +178,7 @@ void main() {
           ),
           lifecycle(
             topicId: 'integral',
+            progressCompletedAt: null,
             completedInitialPracticeCount: 0,
             firstPracticeCompletedAt: null,
             lastPracticeCompletedAt: null,

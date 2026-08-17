@@ -5,8 +5,9 @@ import 'package:rota_app/engine/reinforcement/topic_reinforcement_policy.dart';
 void main() {
   group('TopicReinforcementPolicy', () {
     test('is not due before first practice is completed', () {
-      const lifecycle = TopicLearningLifecycle(
+      final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
+        progressCompletedAt: DateTime.utc(2026, 8, 10),
         completedInitialPracticeCount: 0,
         firstPracticeCompletedAt: null,
         lastPracticeCompletedAt: null,
@@ -25,6 +26,7 @@ void main() {
     test('is not due before 14 days have passed after first practice', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
+        progressCompletedAt: DateTime.utc(2026, 8, 9),
         completedInitialPracticeCount: 1,
         firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
         lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
@@ -43,6 +45,7 @@ void main() {
     test('first reinforcement is due 14 days after first practice', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
+        progressCompletedAt: DateTime.utc(2026, 8, 9),
         completedInitialPracticeCount: 1,
         firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
         lastPracticeCompletedAt: DateTime.utc(2026, 8, 10),
@@ -63,6 +66,7 @@ void main() {
       () {
         final lifecycle = TopicLearningLifecycle(
           topicId: 'fonksiyonlar',
+          progressCompletedAt: DateTime.utc(2026, 8, 9),
           completedInitialPracticeCount: 4,
           firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
           lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),
@@ -82,6 +86,7 @@ void main() {
     test('next reinforcement is due one week after previous reinforcement', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
+        progressCompletedAt: DateTime.utc(2026, 8, 9),
         completedInitialPracticeCount: 4,
         firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
         lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),
@@ -100,6 +105,7 @@ void main() {
     test('topic reinforcement is not due after all three are completed', () {
       final lifecycle = TopicLearningLifecycle(
         topicId: 'fonksiyonlar',
+        progressCompletedAt: DateTime.utc(2026, 8, 9),
         completedInitialPracticeCount: 4,
         firstPracticeCompletedAt: DateTime.utc(2026, 8, 10),
         lastPracticeCompletedAt: DateTime.utc(2026, 8, 15),

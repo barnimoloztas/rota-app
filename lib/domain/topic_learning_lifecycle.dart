@@ -3,6 +3,7 @@ import 'topic.dart';
 class TopicLearningLifecycle {
   const TopicLearningLifecycle({
     required this.topicId,
+    required this.progressCompletedAt,
     required this.completedInitialPracticeCount,
     required this.firstPracticeCompletedAt,
     required this.lastPracticeCompletedAt,
@@ -31,9 +32,18 @@ class TopicLearningLifecycle {
         assert(
           completedReinforcementCount == 0 ||
               completedInitialPracticeCount >= 1,
+        ),
+        assert(
+          completedInitialPracticeCount == 0 ||
+              progressCompletedAt != null,
         );
 
   final TopicId topicId;
+
+  /// When the topic's Progress work was completed.
+  ///
+  /// Null means Progress has not been completed yet.
+  final DateTime? progressCompletedAt;
 
   final int completedInitialPracticeCount;
 
