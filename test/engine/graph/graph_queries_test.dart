@@ -7,6 +7,7 @@ import 'package:rota_app/engine/graph/prerequisite_graph.dart';
 void main() {
   group('graph queries', () {
     const graph = PrerequisiteGraph(
+      subjectId: 'mathematics',
       version: '1.0.0',
       topics: [
         Topic(id: 'functions', title: 'Fonksiyonlar'),
@@ -34,60 +35,45 @@ void main() {
     );
 
     test('returns direct prerequisites only', () {
-      final prerequisites = getDirectPrerequisites(
-        graph,
-        'limits',
-      );
+      final prerequisites = getDirectPrerequisites(graph, 'limits');
 
       expect(prerequisites, hasLength(2));
 
       expect(
-        prerequisites.any(
-          (edge) => edge.prerequisiteTopicId == 'functions',
-        ),
+        prerequisites.any((edge) => edge.prerequisiteTopicId == 'functions'),
         isTrue,
       );
 
       expect(
-        prerequisites.any(
-          (edge) => edge.prerequisiteTopicId == 'polynomials',
-        ),
+        prerequisites.any((edge) => edge.prerequisiteTopicId == 'polynomials'),
         isTrue,
       );
     });
 
-    test('does not return transitive prerequisites as direct prerequisites', () {
-      final prerequisites = getDirectPrerequisites(
-        graph,
-        'derivatives',
-      );
+    test(
+      'does not return transitive prerequisites as direct prerequisites',
+      () {
+        final prerequisites = getDirectPrerequisites(graph, 'derivatives');
 
-      expect(prerequisites, hasLength(1));
-      expect(prerequisites.first.prerequisiteTopicId, 'limits');
+        expect(prerequisites, hasLength(1));
+        expect(prerequisites.first.prerequisiteTopicId, 'limits');
 
-      expect(
-        prerequisites.any(
-          (edge) => edge.prerequisiteTopicId == 'functions',
-        ),
-        isFalse,
-      );
-    });
+        expect(
+          prerequisites.any((edge) => edge.prerequisiteTopicId == 'functions'),
+          isFalse,
+        );
+      },
+    );
 
     test('returns direct dependents', () {
-      final dependents = getDirectDependents(
-        graph,
-        'limits',
-      );
+      final dependents = getDirectDependents(graph, 'limits');
 
       expect(dependents, hasLength(1));
       expect(dependents.first.targetTopicId, 'derivatives');
     });
 
     test('returns only hard prerequisites', () {
-      final prerequisites = getDirectHardPrerequisites(
-        graph,
-        'limits',
-      );
+      final prerequisites = getDirectHardPrerequisites(graph, 'limits');
 
       expect(prerequisites, hasLength(1));
       expect(prerequisites.first.prerequisiteTopicId, 'functions');
@@ -95,10 +81,7 @@ void main() {
     });
 
     test('returns only soft prerequisites', () {
-      final prerequisites = getDirectSoftPrerequisites(
-        graph,
-        'limits',
-      );
+      final prerequisites = getDirectSoftPrerequisites(graph, 'limits');
 
       expect(prerequisites, hasLength(1));
       expect(prerequisites.first.prerequisiteTopicId, 'polynomials');
@@ -106,10 +89,7 @@ void main() {
     });
 
     test('returns topic when topic id exists', () {
-      final topic = getTopicById(
-        graph,
-        'limits',
-      );
+      final topic = getTopicById(graph, 'limits');
 
       expect(topic, isNotNull);
       expect(topic!.id, 'limits');
@@ -117,10 +97,7 @@ void main() {
     });
 
     test('returns null when topic id does not exist', () {
-      final topic = getTopicById(
-        graph,
-        'integrals',
-      );
+      final topic = getTopicById(graph, 'integrals');
 
       expect(topic, isNull);
     });

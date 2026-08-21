@@ -1,4 +1,4 @@
-typedef SubjectId = String;
+import 'subject.dart';
 
 class SubjectReinforcementLifecycle {
   const SubjectReinforcementLifecycle({
@@ -6,15 +6,15 @@ class SubjectReinforcementLifecycle {
     required this.startedAt,
     required this.completedInitialReinforcementCount,
     required this.lastReinforcementCompletedAt,
-  })  : assert(
-          completedInitialReinforcementCount >= 0 &&
-              completedInitialReinforcementCount <= 3,
-        ),
-        assert(
-          completedInitialReinforcementCount == 0
-              ? lastReinforcementCompletedAt == null
-              : lastReinforcementCompletedAt != null,
-        );
+  }) : assert(
+         completedInitialReinforcementCount >= 0 &&
+             completedInitialReinforcementCount <= 3,
+       ),
+       assert(
+         completedInitialReinforcementCount == 0
+             ? lastReinforcementCompletedAt == null
+             : lastReinforcementCompletedAt != null,
+       );
 
   final SubjectId subjectId;
 

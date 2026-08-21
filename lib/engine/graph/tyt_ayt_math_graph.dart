@@ -3,6 +3,7 @@ import '../../domain/topic.dart';
 import 'prerequisite_graph.dart';
 
 const tytAytMathGraph = PrerequisiteGraph(
+  subjectId: 'mathematics',
   version: '1.0.0',
   topics: [
     // A — Temel Cebir

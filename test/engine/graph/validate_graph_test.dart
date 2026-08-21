@@ -8,6 +8,7 @@ void main() {
   group('validateGraph', () {
     test('returns no errors for a valid graph', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
         topics: [
           Topic(id: 'functions', title: 'Fonksiyonlar'),
@@ -29,6 +30,7 @@ void main() {
 
     test('detects duplicate topic ids', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
         topics: [
           Topic(id: 'functions', title: 'Fonksiyonlar'),
@@ -41,8 +43,7 @@ void main() {
 
       expect(
         errors.any(
-          (error) =>
-              error.type == GraphValidationErrorType.duplicateTopicId,
+          (error) => error.type == GraphValidationErrorType.duplicateTopicId,
         ),
         isTrue,
       );
@@ -50,6 +51,7 @@ void main() {
 
     test('detects duplicate edges', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
         topics: [
           Topic(id: 'functions', title: 'Fonksiyonlar'),
@@ -81,10 +83,9 @@ void main() {
 
     test('detects missing prerequisite topic', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
-        topics: [
-          Topic(id: 'limits', title: 'Limit'),
-        ],
+        topics: [Topic(id: 'limits', title: 'Limit')],
         edges: [
           PrerequisiteEdge(
             prerequisiteTopicId: 'functions',
@@ -99,8 +100,7 @@ void main() {
       expect(
         errors.any(
           (error) =>
-              error.type ==
-              GraphValidationErrorType.missingPrerequisiteTopic,
+              error.type == GraphValidationErrorType.missingPrerequisiteTopic,
         ),
         isTrue,
       );
@@ -108,10 +108,9 @@ void main() {
 
     test('detects missing target topic', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
-        topics: [
-          Topic(id: 'functions', title: 'Fonksiyonlar'),
-        ],
+        topics: [Topic(id: 'functions', title: 'Fonksiyonlar')],
         edges: [
           PrerequisiteEdge(
             prerequisiteTopicId: 'functions',
@@ -125,8 +124,7 @@ void main() {
 
       expect(
         errors.any(
-          (error) =>
-              error.type == GraphValidationErrorType.missingTargetTopic,
+          (error) => error.type == GraphValidationErrorType.missingTargetTopic,
         ),
         isTrue,
       );
@@ -134,10 +132,9 @@ void main() {
 
     test('detects self edges', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
-        topics: [
-          Topic(id: 'functions', title: 'Fonksiyonlar'),
-        ],
+        topics: [Topic(id: 'functions', title: 'Fonksiyonlar')],
         edges: [
           PrerequisiteEdge(
             prerequisiteTopicId: 'functions',
@@ -150,19 +147,16 @@ void main() {
       final errors = validateGraph(graph);
 
       expect(
-        errors.any(
-          (error) => error.type == GraphValidationErrorType.selfEdge,
-        ),
+        errors.any((error) => error.type == GraphValidationErrorType.selfEdge),
         isTrue,
       );
     });
 
     test('detects missing graph version', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '   ',
-        topics: [
-          Topic(id: 'functions', title: 'Fonksiyonlar'),
-        ],
+        topics: [Topic(id: 'functions', title: 'Fonksiyonlar')],
         edges: [],
       );
 
@@ -178,6 +172,7 @@ void main() {
 
     test('detects cycles', () {
       const graph = PrerequisiteGraph(
+        subjectId: 'mathematics',
         version: '1.0.0',
         topics: [
           Topic(id: 'a', title: 'A'),

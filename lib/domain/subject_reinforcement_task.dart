@@ -1,15 +1,9 @@
-import 'subject_reinforcement_lifecycle.dart';
+import 'subject.dart';
 
-enum SubjectReinforcementTaskType {
-  topicReinforcement,
-  branchReinforcement,
-}
+enum SubjectReinforcementTaskType { topicReinforcement, branchReinforcement }
 
 class SubjectReinforcementTask {
-  const SubjectReinforcementTask({
-    required this.subjectId,
-    required this.type,
-  });
+  const SubjectReinforcementTask({required this.subjectId, required this.type});
 
   final SubjectId subjectId;
 

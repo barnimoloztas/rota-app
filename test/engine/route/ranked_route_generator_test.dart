@@ -14,9 +14,7 @@ void main() {
     bridgeCostWeight: 0.10,
   );
 
-  const routeSelectionConfig = RouteSelectionConfig(
-    maxTasks: 4,
-  );
+  const routeSelectionConfig = RouteSelectionConfig(maxTasks: 4);
 
   group('generateRankedRoute', () {
     test('ranking order is reflected in route task order', () {
@@ -24,9 +22,7 @@ void main() {
         StudyCandidate(
           topicId: 'low_priority',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -40,9 +36,7 @@ void main() {
         StudyCandidate(
           topicId: 'high_priority',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -57,6 +51,7 @@ void main() {
 
       final route = generateRankedRoute(
         const RankedRouteGenerationInput(
+          subjectId: 'mathematics',
           candidates: candidates,
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
@@ -75,9 +70,7 @@ void main() {
         StudyCandidate(
           topicId: 'topic_a',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -91,9 +84,7 @@ void main() {
         StudyCandidate(
           topicId: 'topic_b',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -108,6 +99,7 @@ void main() {
 
       final route = generateRankedRoute(
         const RankedRouteGenerationInput(
+          subjectId: 'mathematics',
           candidates: candidates,
           examProfilesByTopicId: {
             'topic_a': TopicExamProfile(
@@ -134,9 +126,7 @@ void main() {
         StudyCandidate(
           topicId: 'bridge_target',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: true,
           bridgeTopicId: 'bridge_topic',
           signals: [
@@ -150,9 +140,7 @@ void main() {
         StudyCandidate(
           topicId: 'direct_target',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -167,6 +155,7 @@ void main() {
 
       final route = generateRankedRoute(
         const RankedRouteGenerationInput(
+          subjectId: 'mathematics',
           candidates: candidates,
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
@@ -183,9 +172,7 @@ void main() {
         StudyCandidate(
           topicId: 'a',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -199,9 +186,7 @@ void main() {
         StudyCandidate(
           topicId: 'b',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -215,9 +200,7 @@ void main() {
         StudyCandidate(
           topicId: 'c',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -231,9 +214,7 @@ void main() {
         StudyCandidate(
           topicId: 'd',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -247,9 +228,7 @@ void main() {
         StudyCandidate(
           topicId: 'e',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -264,6 +243,7 @@ void main() {
 
       final route = generateRankedRoute(
         const RankedRouteGenerationInput(
+          subjectId: 'mathematics',
           candidates: candidates,
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
@@ -274,10 +254,7 @@ void main() {
 
       expect(route.tasks, hasLength(4));
 
-      expect(
-        route.tasks.map((task) => task.topicId),
-        ['a', 'b', 'c', 'd'],
-      );
+      expect(route.tasks.map((task) => task.topicId), ['a', 'b', 'c', 'd']);
     });
 
     test('bridge and target remain together after ranking and selection', () {
@@ -285,9 +262,7 @@ void main() {
         StudyCandidate(
           topicId: 'bridge_target',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: true,
           bridgeTopicId: 'bridge_topic',
           signals: [
@@ -301,9 +276,7 @@ void main() {
         StudyCandidate(
           topicId: 'other_topic',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
           signals: [
@@ -318,12 +291,11 @@ void main() {
 
       final route = generateRankedRoute(
         const RankedRouteGenerationInput(
+          subjectId: 'mathematics',
           candidates: candidates,
           examProfilesByTopicId: {},
           rankingConfig: rankingConfig,
-          routeSelectionConfig: RouteSelectionConfig(
-            maxTasks: 2,
-          ),
+          routeSelectionConfig: RouteSelectionConfig(maxTasks: 2),
           selectedMode: SelectedMode.balanced,
         ),
       );
@@ -335,13 +307,12 @@ void main() {
 
     test('same input produces same ranked route', () {
       const input = RankedRouteGenerationInput(
+        subjectId: 'mathematics',
         candidates: [
           StudyCandidate(
             topicId: 'beta',
             primarySource: CandidateSource.repair,
-            sources: {
-              CandidateSource.repair,
-            },
+            sources: {CandidateSource.repair},
             requiresBridge: false,
             bridgeTopicId: null,
             signals: [
@@ -355,9 +326,7 @@ void main() {
           StudyCandidate(
             topicId: 'alpha',
             primarySource: CandidateSource.repair,
-            sources: {
-              CandidateSource.repair,
-            },
+            sources: {CandidateSource.repair},
             requiresBridge: false,
             bridgeTopicId: null,
             signals: [

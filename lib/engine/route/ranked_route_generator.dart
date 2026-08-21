@@ -1,6 +1,7 @@
 import '../../domain/selected_mode.dart';
 import '../../domain/study_candidate.dart';
-import '../../domain/study_route.dart';
+import '../../domain/subject.dart';
+import '../../domain/subject_study_route.dart';
 import '../../domain/topic_exam_profile.dart';
 import '../candidate/candidate_aggregator.dart';
 import '../ranking/candidate_ranker.dart';
@@ -9,12 +10,15 @@ import 'route_selector.dart';
 
 class RankedRouteGenerationInput {
   const RankedRouteGenerationInput({
+    required this.subjectId,
     required this.candidates,
     required this.examProfilesByTopicId,
     required this.rankingConfig,
     required this.routeSelectionConfig,
     required this.selectedMode,
   });
+
+  final SubjectId subjectId;
 
   final List<StudyCandidate> candidates;
 
@@ -27,9 +31,7 @@ class RankedRouteGenerationInput {
   final SelectedMode selectedMode;
 }
 
-StudyRoute generateRankedRoute(
-  RankedRouteGenerationInput input,
-) {
+SubjectStudyRoute generateRankedRoute(RankedRouteGenerationInput input) {
   final evaluations = aggregateCandidates(
     input.candidates,
     examProfilesByTopicId: input.examProfilesByTopicId,
@@ -41,9 +43,7 @@ StudyRoute generateRankedRoute(
   );
 
   final orderedCandidates = ranked
-      .map(
-        (rankedCandidate) => rankedCandidate.evaluation.candidate,
-      )
+      .map((rankedCandidate) => rankedCandidate.evaluation.candidate)
       .toList(growable: false);
 
   final route = buildRoute(
@@ -51,8 +51,10 @@ StudyRoute generateRankedRoute(
     selectedMode: input.selectedMode,
   );
 
-  return selectRouteTasks(
+  final selectedRoute = selectRouteTasks(
     route: route,
     config: input.routeSelectionConfig,
   );
+
+  return SubjectStudyRoute(subjectId: input.subjectId, route: selectedRoute);
 }
