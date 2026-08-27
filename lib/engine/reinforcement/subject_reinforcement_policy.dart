@@ -13,18 +13,29 @@ class SubjectReinforcementEvaluation {
   final SubjectReinforcementType? type;
 }
 
+DateTime subjectReinforcementDueAt({
+  required SubjectReinforcementLifecycle lifecycle,
+}) {
+  final cadence = subjectReinforcementCadenceFor(lifecycle.subjectId);
+
+  if (lifecycle.completedInitialReinforcementCount == 0) {
+    return lifecycle.startedAt.add(Duration(days: cadence.firstDueAfterDays));
+  }
+
+  return lifecycle.lastReinforcementCompletedAt!.add(
+    Duration(days: cadence.repeatEveryDays),
+  );
+}
+
 SubjectReinforcementEvaluation evaluateSubjectReinforcement({
   required SubjectReinforcementLifecycle lifecycle,
   required DateTime evaluatedAt,
 }) {
   final cadence = subjectReinforcementCadenceFor(lifecycle.subjectId);
+  final dueAt = subjectReinforcementDueAt(lifecycle: lifecycle);
 
   if (lifecycle.completedInitialReinforcementCount == 0) {
-    final firstDueAt = lifecycle.startedAt.add(
-      Duration(days: cadence.firstDueAfterDays),
-    );
-
-    if (evaluatedAt.isBefore(firstDueAt)) {
+    if (evaluatedAt.isBefore(dueAt)) {
       return const SubjectReinforcementEvaluation(isDue: false, type: null);
     }
 
@@ -34,11 +45,7 @@ SubjectReinforcementEvaluation evaluateSubjectReinforcement({
     );
   }
 
-  final nextDueAt = lifecycle.lastReinforcementCompletedAt!.add(
-    Duration(days: cadence.repeatEveryDays),
-  );
-
-  if (evaluatedAt.isBefore(nextDueAt)) {
+  if (evaluatedAt.isBefore(dueAt)) {
     return const SubjectReinforcementEvaluation(isDue: false, type: null);
   }
 
