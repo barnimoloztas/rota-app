@@ -23,9 +23,13 @@ class DailyReinforcementCandidate {
 
 class DailyPlanDraft {
   const DailyPlanDraft({
+    this.protectedTasks = const [],
     required this.normalRoute,
     required this.reinforcement,
   });
+
+  /// Preselected tasks that the daily composer must not displace.
+  final List<StudyTask> protectedTasks;
 
   /// Normal topic-based tasks selected by the existing route selector.
   final StudyRoute normalRoute;
@@ -34,6 +38,8 @@ class DailyPlanDraft {
   final DailyReinforcementCandidate? reinforcement;
 
   int get taskCount {
-    return normalRoute.tasks.length + (reinforcement == null ? 0 : 1);
+    return protectedTasks.length +
+        normalRoute.tasks.length +
+        (reinforcement == null ? 0 : 1);
   }
 }
