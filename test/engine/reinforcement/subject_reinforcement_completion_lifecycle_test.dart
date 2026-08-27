@@ -79,5 +79,40 @@ void main() {
       expect(result.completedInitialReinforcementCount, 3);
       expect(result.lastReinforcementCompletedAt, completedAt);
     });
+
+    test('non-mathematics branch completion keeps initial count at two', () {
+      final lifecycle = SubjectReinforcementLifecycle(
+        subjectId: 'physics',
+        startedAt: DateTime.utc(2026, 8, 1),
+        completedInitialReinforcementCount: 2,
+        lastReinforcementCompletedAt: DateTime.utc(2026, 8, 29),
+      );
+
+      final completedAt = DateTime.utc(2026, 9, 12);
+
+      final result = completeSubjectReinforcement(
+        lifecycle: lifecycle,
+        completedAt: completedAt,
+      );
+
+      expect(result.completedInitialReinforcementCount, 2);
+      expect(result.lastReinforcementCompletedAt, completedAt);
+    });
+
+    test('does not reduce an existing legacy count above subject cadence', () {
+      final lifecycle = SubjectReinforcementLifecycle(
+        subjectId: 'physics',
+        startedAt: DateTime.utc(2026, 8, 1),
+        completedInitialReinforcementCount: 3,
+        lastReinforcementCompletedAt: DateTime.utc(2026, 8, 29),
+      );
+
+      final result = completeSubjectReinforcement(
+        lifecycle: lifecycle,
+        completedAt: DateTime.utc(2026, 9, 12),
+      );
+
+      expect(result.completedInitialReinforcementCount, 3);
+    });
   });
 }

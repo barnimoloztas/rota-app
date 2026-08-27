@@ -25,15 +25,16 @@ class SubjectReinforcementLifecycle {
 
   /// Number of completed initial reinforcement steps.
   ///
-  /// 0 -> R1 not completed
-  /// 1 -> R1 completed
-  /// 2 -> R2 completed
-  /// 3 -> R1-R3 completed; branch reinforcement phase is active
+  /// The subject policy determines how many initial steps are required
+  /// before the branch reinforcement phase becomes active.
+  ///
+  /// Mathematics currently uses three steps. Other supported subjects
+  /// currently use two steps.
   final int completedInitialReinforcementCount;
 
   /// Completion time of the most recent reinforcement task.
   ///
-  /// After R3 this continues to track the most recent
+  /// In the branch phase this continues to track the most recent
   /// branch reinforcement completion.
   final DateTime? lastReinforcementCompletedAt;
 }
