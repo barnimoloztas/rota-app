@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/daily_plan_draft.dart';
 import 'package:rota_app/domain/study_route.dart';
+import 'package:rota_app/domain/subject_plan_task.dart';
 import 'package:rota_app/domain/subject_reinforcement_task.dart';
 import 'package:rota_app/domain/tyt_social_reinforcement_task.dart';
 import 'package:rota_app/engine/planning/untouched_daily_plan_composer.dart';
@@ -8,19 +9,48 @@ import 'package:rota_app/engine/planning/untouched_daily_plan_composer.dart';
 void main() {
   final evaluatedAt = DateTime.utc(2026, 8, 27);
 
-  const rankedNormalRoute = StudyRoute(
-    tasks: [
-      StudyTask(topicId: 'a', type: StudyTaskType.repair, sourceTopicId: 'a'),
-      StudyTask(topicId: 'b', type: StudyTaskType.practice, sourceTopicId: 'b'),
-      StudyTask(
+  const rankedNormalTasks = [
+    SubjectPlanTask(
+      subjectId: 'mathematics',
+      task: StudyTask(
+        topicId: 'a',
+        type: StudyTaskType.repair,
+        sourceTopicId: 'a',
+      ),
+    ),
+    SubjectPlanTask(
+      subjectId: 'physics',
+      task: StudyTask(
+        topicId: 'b',
+        type: StudyTaskType.practice,
+        sourceTopicId: 'b',
+      ),
+    ),
+    SubjectPlanTask(
+      subjectId: 'chemistry',
+      task: StudyTask(
         topicId: 'c',
         type: StudyTaskType.measurement,
         sourceTopicId: 'c',
       ),
-      StudyTask(topicId: 'd', type: StudyTaskType.progress, sourceTopicId: 'd'),
-      StudyTask(topicId: 'e', type: StudyTaskType.progress, sourceTopicId: 'e'),
-    ],
-  );
+    ),
+    SubjectPlanTask(
+      subjectId: 'biology',
+      task: StudyTask(
+        topicId: 'd',
+        type: StudyTaskType.progress,
+        sourceTopicId: 'd',
+      ),
+    ),
+    SubjectPlanTask(
+      subjectId: 'turkish',
+      task: StudyTask(
+        topicId: 'e',
+        type: StudyTaskType.progress,
+        sourceTopicId: 'e',
+      ),
+    ),
+  ];
 
   DailyReinforcementCandidate subjectCandidate({
     required String id,
@@ -41,7 +71,7 @@ void main() {
   group('composeUntouchedDailyPlan', () {
     test('keeps four normal tasks when no reinforcement is due', () {
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [
           subjectCandidate(
             id: 'future',
@@ -52,6 +82,10 @@ void main() {
       );
 
       expect(draft.reinforcement, isNull);
+      expect(
+        draft.normalSubjectTasks.map((plannedTask) => plannedTask.subjectId),
+        ['mathematics', 'physics', 'chemistry', 'biology'],
+      );
       expect(draft.normalRoute.tasks.map((task) => task.topicId), [
         'a',
         'b',
@@ -65,7 +99,7 @@ void main() {
       final due = subjectCandidate(id: 'due', dueAt: evaluatedAt);
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [due],
         evaluatedAt: evaluatedAt,
       );
@@ -77,7 +111,7 @@ void main() {
         'c',
       ]);
       expect(draft.taskCount, 4);
-      expect(rankedNormalRoute.tasks, hasLength(5));
+      expect(rankedNormalTasks, hasLength(5));
     });
 
     test('selects only the oldest due reinforcement', () {
@@ -93,7 +127,7 @@ void main() {
       );
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [newer, oldest],
         evaluatedAt: evaluatedAt,
       );
@@ -115,7 +149,7 @@ void main() {
       );
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [lowerImportance, higherImportance],
         evaluatedAt: evaluatedAt,
       );
@@ -136,12 +170,12 @@ void main() {
       );
 
       final first = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [beta, alpha],
         evaluatedAt: evaluatedAt,
       );
       final second = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [alpha, beta],
         evaluatedAt: evaluatedAt,
       );
@@ -151,33 +185,43 @@ void main() {
     });
 
     test('keeps bridge and target together within remaining slots', () {
-      const routeWithBridge = StudyRoute(
-        tasks: [
-          StudyTask(
+      const routeWithBridgeTasks = [
+        SubjectPlanTask(
+          subjectId: 'mathematics',
+          task: StudyTask(
             topicId: 'a',
             type: StudyTaskType.repair,
             sourceTopicId: 'a',
           ),
-          StudyTask(
+        ),
+        SubjectPlanTask(
+          subjectId: 'mathematics',
+          task: StudyTask(
             topicId: 'bridge',
             type: StudyTaskType.bridge,
             sourceTopicId: 'target',
           ),
-          StudyTask(
+        ),
+        SubjectPlanTask(
+          subjectId: 'mathematics',
+          task: StudyTask(
             topicId: 'target',
             type: StudyTaskType.progress,
             sourceTopicId: 'target',
           ),
-          StudyTask(
+        ),
+        SubjectPlanTask(
+          subjectId: 'physics',
+          task: StudyTask(
             topicId: 'later',
             type: StudyTaskType.practice,
             sourceTopicId: 'later',
           ),
-        ],
-      );
+        ),
+      ];
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: routeWithBridge,
+        rankedNormalTasks: routeWithBridgeTasks,
         reinforcementCandidates: [
           subjectCandidate(id: 'due', dueAt: evaluatedAt),
         ],
@@ -189,6 +233,10 @@ void main() {
         'bridge',
         'target',
       ]);
+      expect(
+        draft.normalSubjectTasks.map((plannedTask) => plannedTask.subjectId),
+        ['mathematics', 'mathematics', 'mathematics'],
+      );
       expect(draft.taskCount, 4);
     });
   });

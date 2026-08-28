@@ -1,31 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/daily_plan_draft.dart';
 import 'package:rota_app/domain/study_route.dart';
+import 'package:rota_app/domain/subject_plan_task.dart';
 import 'package:rota_app/domain/subject_reinforcement_task.dart';
 import 'package:rota_app/engine/planning/untouched_daily_plan_composer.dart';
 
 void main() {
   final evaluatedAt = DateTime.utc(2026, 8, 27);
 
-  const rankedNormalRoute = StudyRoute(
-    tasks: [
-      StudyTask(
+  const rankedNormalTasks = [
+    SubjectPlanTask(
+      subjectId: 'mathematics',
+      task: StudyTask(
         topicId: 'normal-a',
         type: StudyTaskType.repair,
         sourceTopicId: 'normal-a',
       ),
-      StudyTask(
+    ),
+    SubjectPlanTask(
+      subjectId: 'physics',
+      task: StudyTask(
         topicId: 'normal-b',
         type: StudyTaskType.practice,
         sourceTopicId: 'normal-b',
       ),
-      StudyTask(
+    ),
+    SubjectPlanTask(
+      subjectId: 'chemistry',
+      task: StudyTask(
         topicId: 'normal-c',
         type: StudyTaskType.progress,
         sourceTopicId: 'normal-c',
       ),
-    ],
-  );
+    ),
+  ];
 
   final dueReinforcement = DailyReinforcementCandidate(
     id: 'subject:mathematics',
@@ -37,11 +45,14 @@ void main() {
     ),
   );
 
-  StudyTask protectedTask(String topicId) {
-    return StudyTask(
-      topicId: topicId,
-      type: StudyTaskType.practice,
-      sourceTopicId: topicId,
+  SubjectPlanTask protectedTask(String topicId, String subjectId) {
+    return SubjectPlanTask(
+      subjectId: subjectId,
+      task: StudyTask(
+        topicId: topicId,
+        type: StudyTaskType.practice,
+        sourceTopicId: topicId,
+      ),
     );
   }
 
@@ -50,18 +61,22 @@ void main() {
       'places reinforcement and one normal task after two protected tasks',
       () {
         final protectedTasks = [
-          protectedTask('protected-a'),
-          protectedTask('protected-b'),
+          protectedTask('protected-a', 'mathematics'),
+          protectedTask('protected-b', 'physics'),
         ];
 
         final draft = composeDailyPlan(
-          protectedTasks: protectedTasks,
-          rankedNormalRoute: rankedNormalRoute,
+          protectedSubjectTasks: protectedTasks,
+          rankedNormalTasks: rankedNormalTasks,
           reinforcementCandidates: [dueReinforcement],
           evaluatedAt: evaluatedAt,
         );
 
-        expect(draft.protectedTasks, orderedEquals(protectedTasks));
+        expect(draft.protectedSubjectTasks, orderedEquals(protectedTasks));
+        expect(
+          draft.protectedTasks,
+          orderedEquals(protectedTasks.map((plannedTask) => plannedTask.task)),
+        );
         expect(draft.reinforcement, same(dueReinforcement));
         expect(draft.normalRoute.tasks.map((task) => task.topicId), [
           'normal-a',
@@ -74,19 +89,19 @@ void main() {
       'uses the last slot for reinforcement after three protected tasks',
       () {
         final protectedTasks = [
-          protectedTask('protected-a'),
-          protectedTask('protected-b'),
-          protectedTask('protected-c'),
+          protectedTask('protected-a', 'mathematics'),
+          protectedTask('protected-b', 'physics'),
+          protectedTask('protected-c', 'chemistry'),
         ];
 
         final draft = composeDailyPlan(
-          protectedTasks: protectedTasks,
-          rankedNormalRoute: rankedNormalRoute,
+          protectedSubjectTasks: protectedTasks,
+          rankedNormalTasks: rankedNormalTasks,
           reinforcementCandidates: [dueReinforcement],
           evaluatedAt: evaluatedAt,
         );
 
-        expect(draft.protectedTasks, orderedEquals(protectedTasks));
+        expect(draft.protectedSubjectTasks, orderedEquals(protectedTasks));
         expect(draft.reinforcement, same(dueReinforcement));
         expect(draft.normalRoute.tasks, isEmpty);
         expect(draft.taskCount, 4);
@@ -95,20 +110,20 @@ void main() {
 
     test('does not displace four protected tasks for reinforcement', () {
       final protectedTasks = [
-        protectedTask('protected-a'),
-        protectedTask('protected-b'),
-        protectedTask('protected-c'),
-        protectedTask('protected-d'),
+        protectedTask('protected-a', 'mathematics'),
+        protectedTask('protected-b', 'physics'),
+        protectedTask('protected-c', 'chemistry'),
+        protectedTask('protected-d', 'biology'),
       ];
 
       final draft = composeDailyPlan(
-        protectedTasks: protectedTasks,
-        rankedNormalRoute: rankedNormalRoute,
+        protectedSubjectTasks: protectedTasks,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [dueReinforcement],
         evaluatedAt: evaluatedAt,
       );
 
-      expect(draft.protectedTasks, orderedEquals(protectedTasks));
+      expect(draft.protectedSubjectTasks, orderedEquals(protectedTasks));
       expect(draft.reinforcement, isNull);
       expect(draft.normalRoute.tasks, isEmpty);
       expect(draft.taskCount, 4);
@@ -116,13 +131,13 @@ void main() {
 
     test('fills remaining slots with normal tasks when none is due', () {
       final protectedTasks = [
-        protectedTask('protected-a'),
-        protectedTask('protected-b'),
+        protectedTask('protected-a', 'mathematics'),
+        protectedTask('protected-b', 'physics'),
       ];
 
       final draft = composeDailyPlan(
-        protectedTasks: protectedTasks,
-        rankedNormalRoute: rankedNormalRoute,
+        protectedSubjectTasks: protectedTasks,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: const [],
         evaluatedAt: evaluatedAt,
       );
@@ -132,6 +147,10 @@ void main() {
         'normal-a',
         'normal-b',
       ]);
+      expect(
+        draft.normalSubjectTasks.map((plannedTask) => plannedTask.subjectId),
+        ['mathematics', 'physics'],
+      );
       expect(draft.taskCount, 4);
     });
   });

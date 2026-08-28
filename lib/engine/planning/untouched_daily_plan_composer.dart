@@ -1,34 +1,38 @@
 import '../../domain/daily_plan_draft.dart';
 import '../../domain/study_route.dart';
+import '../../domain/subject_plan_task.dart';
 import '../route/route_selector.dart';
 
 const _maximumDailyTaskCount = 4;
 
 DailyPlanDraft composeUntouchedDailyPlan({
-  required StudyRoute rankedNormalRoute,
+  required Iterable<SubjectPlanTask> rankedNormalTasks,
   required Iterable<DailyReinforcementCandidate> reinforcementCandidates,
   required DateTime evaluatedAt,
 }) {
   return composeDailyPlan(
-    protectedTasks: const [],
-    rankedNormalRoute: rankedNormalRoute,
+    protectedSubjectTasks: const [],
+    rankedNormalTasks: rankedNormalTasks,
     reinforcementCandidates: reinforcementCandidates,
     evaluatedAt: evaluatedAt,
   );
 }
 
 DailyPlanDraft composeDailyPlan({
-  required Iterable<StudyTask> protectedTasks,
-  required StudyRoute rankedNormalRoute,
+  required Iterable<SubjectPlanTask> protectedSubjectTasks,
+  required Iterable<SubjectPlanTask> rankedNormalTasks,
   required Iterable<DailyReinforcementCandidate> reinforcementCandidates,
   required DateTime evaluatedAt,
 }) {
-  final preservedTasks = List<StudyTask>.unmodifiable(protectedTasks);
+  final preservedTasks = List<SubjectPlanTask>.unmodifiable(
+    protectedSubjectTasks,
+  );
+  final rankedTasks = List<SubjectPlanTask>.unmodifiable(rankedNormalTasks);
 
   if (preservedTasks.length > _maximumDailyTaskCount) {
     throw ArgumentError.value(
       preservedTasks.length,
-      'protectedTasks',
+      'protectedSubjectTasks',
       'Protected tasks cannot exceed the daily task ceiling.',
     );
   }
@@ -48,14 +52,21 @@ DailyPlanDraft composeDailyPlan({
   final normalTaskCapacity =
       capacityAfterProtectedTasks - (selectedReinforcement == null ? 0 : 1);
 
-  final normalRoute = selectRouteTasks(
-    route: rankedNormalRoute,
+  final selectedNormalRoute = selectRouteTasks(
+    route: StudyRoute(
+      tasks: List<StudyTask>.unmodifiable(
+        rankedTasks.map((plannedTask) => plannedTask.task),
+      ),
+    ),
     config: RouteSelectionConfig(maxTasks: normalTaskCapacity),
+  );
+  final selectedNormalTasks = List<SubjectPlanTask>.unmodifiable(
+    rankedTasks.take(selectedNormalRoute.tasks.length),
   );
 
   return DailyPlanDraft(
-    protectedTasks: preservedTasks,
-    normalRoute: normalRoute,
+    protectedSubjectTasks: preservedTasks,
+    normalSubjectTasks: selectedNormalTasks,
     reinforcement: selectedReinforcement,
   );
 }

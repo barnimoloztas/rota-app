@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/daily_plan_draft.dart';
 import 'package:rota_app/domain/study_route.dart';
+import 'package:rota_app/domain/subject_plan_task.dart';
 import 'package:rota_app/domain/subject_reinforcement_lifecycle.dart';
 import 'package:rota_app/domain/subject_reinforcement_task.dart';
 import 'package:rota_app/domain/tyt_social_reinforcement_lifecycle.dart';
@@ -9,18 +10,40 @@ import 'package:rota_app/engine/planning/untouched_daily_plan_composer.dart';
 import 'package:rota_app/engine/reinforcement/daily_reinforcement_candidate_generator.dart';
 
 void main() {
-  const rankedNormalRoute = StudyRoute(
-    tasks: [
-      StudyTask(topicId: 'a', type: StudyTaskType.repair, sourceTopicId: 'a'),
-      StudyTask(topicId: 'b', type: StudyTaskType.practice, sourceTopicId: 'b'),
-      StudyTask(
+  const rankedNormalTasks = [
+    SubjectPlanTask(
+      subjectId: 'mathematics',
+      task: StudyTask(
+        topicId: 'a',
+        type: StudyTaskType.repair,
+        sourceTopicId: 'a',
+      ),
+    ),
+    SubjectPlanTask(
+      subjectId: 'physics',
+      task: StudyTask(
+        topicId: 'b',
+        type: StudyTaskType.practice,
+        sourceTopicId: 'b',
+      ),
+    ),
+    SubjectPlanTask(
+      subjectId: 'chemistry',
+      task: StudyTask(
         topicId: 'c',
         type: StudyTaskType.measurement,
         sourceTopicId: 'c',
       ),
-      StudyTask(topicId: 'd', type: StudyTaskType.progress, sourceTopicId: 'd'),
-    ],
-  );
+    ),
+    SubjectPlanTask(
+      subjectId: 'biology',
+      task: StudyTask(
+        topicId: 'd',
+        type: StudyTaskType.progress,
+        sourceTopicId: 'd',
+      ),
+    ),
+  ];
 
   group('daily reinforcement plan scenario', () {
     test('keeps four normal tasks before real reinforcements are due', () {
@@ -45,7 +68,7 @@ void main() {
       );
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [
           subjectCandidate,
           socialCandidate,
@@ -97,7 +120,7 @@ void main() {
       expect(dueSocialCandidate.task, isA<TytSocialReinforcementTask>());
 
       final draft = composeUntouchedDailyPlan(
-        rankedNormalRoute: rankedNormalRoute,
+        rankedNormalTasks: rankedNormalTasks,
         reinforcementCandidates: [dueSocialCandidate, dueSubjectCandidate],
         evaluatedAt: evaluatedAt,
       );
