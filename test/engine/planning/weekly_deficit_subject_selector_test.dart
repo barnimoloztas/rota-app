@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/study_route.dart';
 import 'package:rota_app/domain/subject_study_route.dart';
+import 'package:rota_app/engine/planning/standard_quantitative_subject_base_weights.dart';
 import 'package:rota_app/engine/planning/weekly_deficit_subject_selector.dart';
 
 void main() {
@@ -62,17 +63,7 @@ void main() {
     });
 
     test('tracks the target distribution across sequential slots', () {
-      const targetWeights = {
-        'mathematics': 0.371,
-        'physics': 0.140,
-        'turkish': 0.130,
-        'chemistry': 0.124,
-        'biology': 0.122,
-        'history': 0.028,
-        'geography': 0.028,
-        'philosophy': 0.028,
-        'religion': 0.028,
-      };
+      final targetWeights = standardQuantitativeSubjectBaseWeights();
       final routes = targetWeights.keys.map(route).toList();
       final allocations = <String, int>{};
 
