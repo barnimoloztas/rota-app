@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rota_app/domain/plan_lifecycle.dart';
+import 'package:rota_app/domain/preparation_phase.dart';
 import 'package:rota_app/domain/study_route.dart';
 import 'package:rota_app/domain/subject_study_route.dart';
 import 'package:rota_app/engine/planning/daily_plan_activation.dart';
@@ -48,6 +49,8 @@ void main() {
     final firstActivation = activateDailyPlan(
       lifecycle: PlanLifecycle.draftUntouched,
       dailyPlan: firstDraft,
+      planPhase: PreparationPhase.early,
+      allocationPhase: PreparationPhase.early,
       allocatedSlotsBySubject: const {},
     );
 
