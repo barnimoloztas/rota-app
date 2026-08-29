@@ -3,6 +3,7 @@ import '../../domain/plan_lifecycle.dart';
 import '../../domain/preparation_phase.dart';
 import '../../domain/subject.dart';
 import 'daily_plan_allocation_accumulator.dart';
+import 'phase_scoped_allocations.dart';
 
 class DailyPlanActivationResult {
   DailyPlanActivationResult._({
@@ -34,17 +35,11 @@ DailyPlanActivationResult activateDailyPlan({
   switch (lifecycle) {
     case PlanLifecycle.draftUntouched:
     case PlanLifecycle.draftStudentModified:
-      if (planPhase.index < allocationPhase.index) {
-        throw ArgumentError.value(
-          planPhase,
-          'planPhase',
-          'Preparation phase cannot move backwards.',
-        );
-      }
-
-      final startingAllocations = planPhase == allocationPhase
-          ? allocatedSlotsBySubject
-          : const <SubjectId, int>{};
+      final startingAllocations = allocationsForPreparationPhase(
+        planPhase: planPhase,
+        allocationPhase: allocationPhase,
+        allocatedSlotsBySubject: allocatedSlotsBySubject,
+      );
 
       return DailyPlanActivationResult._(
         lifecycle: PlanLifecycle.active,

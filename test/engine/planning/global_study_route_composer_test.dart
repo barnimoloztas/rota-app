@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rota_app/domain/preparation_phase.dart';
 import 'package:rota_app/domain/study_route.dart';
 import 'package:rota_app/domain/subject_study_route.dart';
 import 'package:rota_app/engine/planning/global_study_route_composer.dart';
@@ -51,6 +52,8 @@ void main() {
       final segments = composeGlobalStudyRoute(
         subjectRoutes: [mathematics, physics],
         targetWeightsBySubject: const {'mathematics': 0.60, 'physics': 0.40},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
         allocatedSlotsBySubject: const {},
         selectionConfig: const RouteSelectionConfig(maxTasks: 4),
       );
@@ -78,6 +81,8 @@ void main() {
           subjectRoute('physics', [task('physics-1')]),
         ],
         targetWeightsBySubject: const {'mathematics': 0.60, 'physics': 0.40},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
         allocatedSlotsBySubject: allocations,
         selectionConfig: const RouteSelectionConfig(maxTasks: 2),
       );
@@ -101,6 +106,8 @@ void main() {
           subjectRoute('physics', [task('vectors')]),
         ],
         targetWeightsBySubject: const {'mathematics': 0.80, 'physics': 0.20},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
         allocatedSlotsBySubject: const {},
         selectionConfig: const RouteSelectionConfig(maxTasks: 3),
       );
@@ -124,6 +131,8 @@ void main() {
           subjectRoute('physics', [task('vectors')]),
         ],
         targetWeightsBySubject: const {'mathematics': 0.80, 'physics': 0.20},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
         allocatedSlotsBySubject: const {},
         selectionConfig: const RouteSelectionConfig(maxTasks: 1),
       );
@@ -141,6 +150,8 @@ void main() {
       final segments = composeGlobalStudyRoute(
         subjectRoutes: [mathematics],
         targetWeightsBySubject: const {'mathematics': 1.0},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
         allocatedSlotsBySubject: const {},
         selectionConfig: const RouteSelectionConfig(maxTasks: 1),
       );

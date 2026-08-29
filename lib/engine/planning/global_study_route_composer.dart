@@ -1,12 +1,16 @@
+import '../../domain/preparation_phase.dart';
 import '../../domain/study_route.dart';
 import '../../domain/subject.dart';
 import '../../domain/subject_study_route.dart';
 import '../route/route_selector.dart';
+import 'phase_scoped_allocations.dart';
 import 'weekly_deficit_subject_selector.dart';
 
 List<SubjectStudyRoute> composeGlobalStudyRoute({
   required Iterable<SubjectStudyRoute> subjectRoutes,
   required Map<SubjectId, double> targetWeightsBySubject,
+  required PreparationPhase planPhase,
+  required PreparationPhase allocationPhase,
   required Map<SubjectId, int> allocatedSlotsBySubject,
   required RouteSelectionConfig selectionConfig,
 }) {
@@ -20,7 +24,13 @@ List<SubjectStudyRoute> composeGlobalStudyRoute({
         ),
       )
       .toList();
-  final workingAllocations = Map<SubjectId, int>.of(allocatedSlotsBySubject);
+  final workingAllocations = Map<SubjectId, int>.of(
+    allocationsForPreparationPhase(
+      planPhase: planPhase,
+      allocationPhase: allocationPhase,
+      allocatedSlotsBySubject: allocatedSlotsBySubject,
+    ),
+  );
   final selectedSegments = <SubjectStudyRoute>[];
 
   var selectedTaskCount = 0;
