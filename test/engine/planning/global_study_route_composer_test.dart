@@ -10,11 +10,13 @@ void main() {
     String topicId, {
     StudyTaskType type = StudyTaskType.practice,
     String? sourceTopicId,
+    StudyTaskPriority priority = StudyTaskPriority.standard,
   }) {
     return StudyTask(
       topicId: topicId,
       type: type,
       sourceTopicId: sourceTopicId ?? topicId,
+      priority: priority,
     );
   }
 
@@ -89,6 +91,46 @@ void main() {
 
       expect(selectedSubjectIds(segments), ['physics', 'mathematics']);
       expect(allocations, {'mathematics': 1, 'physics': 0});
+    });
+
+    test('uses one urgent override and then resumes weekly deficit', () {
+      final segments = composeGlobalStudyRoute(
+        subjectRoutes: [
+          subjectRoute('mathematics', [
+            task('math-urgent-1', priority: StudyTaskPriority.urgent),
+            task('math-urgent-2', priority: StudyTaskPriority.urgent),
+          ]),
+          subjectRoute('physics', [task('physics-1'), task('physics-2')]),
+        ],
+        targetWeightsBySubject: const {'mathematics': 0.60, 'physics': 0.40},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
+        allocatedSlotsBySubject: const {'mathematics': 1, 'physics': 0},
+        selectionConfig: const RouteSelectionConfig(maxTasks: 2),
+      );
+
+      expect(selectedSubjectIds(segments), ['mathematics', 'physics']);
+      expect(selectedTopicIds(segments), ['math-urgent-1', 'physics-1']);
+    });
+
+    test('uses weekly deficit to choose between urgent subjects', () {
+      final segments = composeGlobalStudyRoute(
+        subjectRoutes: [
+          subjectRoute('mathematics', [
+            task('math-urgent', priority: StudyTaskPriority.urgent),
+          ]),
+          subjectRoute('physics', [
+            task('physics-urgent', priority: StudyTaskPriority.urgent),
+          ]),
+        ],
+        targetWeightsBySubject: const {'mathematics': 0.60, 'physics': 0.40},
+        planPhase: PreparationPhase.early,
+        allocationPhase: PreparationPhase.early,
+        allocatedSlotsBySubject: const {'mathematics': 1, 'physics': 0},
+        selectionConfig: const RouteSelectionConfig(maxTasks: 1),
+      );
+
+      expect(selectedSubjectIds(segments), ['physics']);
     });
 
     test('keeps bridge and target together as a two-slot unit', () {

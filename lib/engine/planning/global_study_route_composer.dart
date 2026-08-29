@@ -34,6 +34,7 @@ List<SubjectStudyRoute> composeGlobalStudyRoute({
   final selectedSegments = <SubjectStudyRoute>[];
 
   var selectedTaskCount = 0;
+  var hasSelectedUrgentUnit = false;
 
   while (selectedTaskCount < selectionConfig.maxTasks) {
     final remainingCapacity = selectionConfig.maxTasks - selectedTaskCount;
@@ -50,8 +51,16 @@ List<SubjectStudyRoute> composeGlobalStudyRoute({
       }
     }
 
+    final urgentRoutes = nextUnitsByRoute.entries
+        .where((entry) => _isUrgentUnit(entry.value))
+        .map((entry) => entry.key)
+        .toList(growable: false);
+    final eligibleRoutes = !hasSelectedUrgentUnit && urgentRoutes.isNotEmpty
+        ? urgentRoutes
+        : nextUnitsByRoute.keys;
+
     final selectedRoute = selectNextSubjectByWeeklyDeficit(
-      subjectRoutes: nextUnitsByRoute.keys,
+      subjectRoutes: eligibleRoutes,
       targetWeightsBySubject: targetWeightsBySubject,
       allocatedSlotsBySubject: workingAllocations,
     );
@@ -62,6 +71,8 @@ List<SubjectStudyRoute> composeGlobalStudyRoute({
 
     final selectedUnit = nextUnitsByRoute[selectedRoute]!;
     final selectedUnitTaskCount = selectedUnit.tasks.length;
+    hasSelectedUrgentUnit =
+        hasSelectedUrgentUnit || _isUrgentUnit(selectedUnit);
 
     selectedSegments.add(
       SubjectStudyRoute(
@@ -88,6 +99,10 @@ List<SubjectStudyRoute> composeGlobalStudyRoute({
   }
 
   return List<SubjectStudyRoute>.unmodifiable(selectedSegments);
+}
+
+bool _isUrgentUnit(StudyRoute route) {
+  return route.tasks.any((task) => task.priority == StudyTaskPriority.urgent);
 }
 
 StudyRoute _selectNextRouteUnit({

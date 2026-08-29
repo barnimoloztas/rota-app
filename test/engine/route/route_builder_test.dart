@@ -10,9 +10,7 @@ void main() {
       const candidate = StudyCandidate(
         topicId: 'fonksiyonlar',
         primarySource: CandidateSource.progress,
-        sources: {
-          CandidateSource.progress,
-        },
+        sources: {CandidateSource.progress},
         requiresBridge: false,
         bridgeTopicId: null,
       );
@@ -32,9 +30,7 @@ void main() {
       const candidate = StudyCandidate(
         topicId: 'problemler',
         primarySource: CandidateSource.practice,
-        sources: {
-          CandidateSource.practice,
-        },
+        sources: {CandidateSource.practice},
         requiresBridge: false,
         bridgeTopicId: null,
       );
@@ -52,9 +48,7 @@ void main() {
       const candidate = StudyCandidate(
         topicId: 'problemler',
         primarySource: CandidateSource.practice,
-        sources: {
-          CandidateSource.practice,
-        },
+        sources: {CandidateSource.practice},
         requiresBridge: false,
         bridgeTopicId: null,
       );
@@ -71,9 +65,7 @@ void main() {
       const candidate = StudyCandidate(
         topicId: 'problemler',
         primarySource: CandidateSource.practice,
-        sources: {
-          CandidateSource.practice,
-        },
+        sources: {CandidateSource.practice},
         requiresBridge: false,
         bridgeTopicId: null,
       );
@@ -91,36 +83,28 @@ void main() {
         StudyCandidate(
           topicId: 'fonksiyonlar',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
         StudyCandidate(
           topicId: 'problemler',
           primarySource: CandidateSource.practice,
-          sources: {
-            CandidateSource.practice,
-          },
+          sources: {CandidateSource.practice},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
         StudyCandidate(
           topicId: 'trigonometri',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
         StudyCandidate(
           topicId: 'integral',
           primarySource: CandidateSource.measurement,
-          sources: {
-            CandidateSource.measurement,
-          },
+          sources: {CandidateSource.measurement},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
@@ -150,9 +134,7 @@ void main() {
       const candidate = StudyCandidate(
         topicId: 'limit_ve_sureklilik',
         primarySource: CandidateSource.progress,
-        sources: {
-          CandidateSource.progress,
-        },
+        sources: {CandidateSource.progress},
         requiresBridge: true,
         bridgeTopicId: 'fonksiyonlar',
       );
@@ -167,14 +149,127 @@ void main() {
       expect(route.tasks[0].topicId, 'fonksiyonlar');
       expect(route.tasks[0].type, StudyTaskType.bridge);
       expect(route.tasks[0].questionTarget, isNull);
-      expect(
-        route.tasks[0].sourceTopicId,
-        'limit_ve_sureklilik',
-      );
+      expect(route.tasks[0].sourceTopicId, 'limit_ve_sureklilik');
 
       expect(route.tasks[1].topicId, 'limit_ve_sureklilik');
       expect(route.tasks[1].type, StudyTaskType.progress);
       expect(route.tasks[1].questionTarget, isNull);
+    });
+
+    test('marks time-sensitive practice and serious repair tasks urgent', () {
+      const urgentReasons = [
+        CandidateReason.initialPractice,
+        CandidateReason.practiceDevelopment,
+        CandidateReason.chronicWeakness,
+        CandidateReason.performanceDecline,
+      ];
+      final candidates = urgentReasons
+          .map(
+            (reason) => StudyCandidate(
+              topicId: reason.name,
+              primarySource:
+                  reason == CandidateReason.initialPractice ||
+                      reason == CandidateReason.practiceDevelopment
+                  ? CandidateSource.practice
+                  : CandidateSource.repair,
+              sources: {
+                reason == CandidateReason.initialPractice ||
+                        reason == CandidateReason.practiceDevelopment
+                    ? CandidateSource.practice
+                    : CandidateSource.repair,
+              },
+              requiresBridge: false,
+              bridgeTopicId: null,
+              signals: [
+                CandidateSignal(
+                  source:
+                      reason == CandidateReason.initialPractice ||
+                          reason == CandidateReason.practiceDevelopment
+                      ? CandidateSource.practice
+                      : CandidateSource.repair,
+                  reason: reason,
+                  strength: 0.80,
+                ),
+              ],
+            ),
+          )
+          .toList();
+
+      final route = buildRoute(
+        candidates: candidates,
+        selectedMode: SelectedMode.balanced,
+      );
+
+      expect(
+        route.tasks.map((task) => task.priority),
+        everyElement(StudyTaskPriority.urgent),
+      );
+    });
+
+    test('keeps routine candidate reasons at standard priority', () {
+      const standardReasons = [
+        CandidateReason.practiceMaintenance,
+        CandidateReason.lowMastery,
+        CandidateReason.lowConfidence,
+        CandidateReason.staleEvidence,
+        CandidateReason.insufficientEvidence,
+      ];
+      final candidates = standardReasons
+          .map(
+            (reason) => StudyCandidate(
+              topicId: reason.name,
+              primarySource: CandidateSource.measurement,
+              sources: const {CandidateSource.measurement},
+              requiresBridge: false,
+              bridgeTopicId: null,
+              signals: [
+                CandidateSignal(
+                  source: CandidateSource.measurement,
+                  reason: reason,
+                  strength: 0.80,
+                ),
+              ],
+            ),
+          )
+          .toList();
+
+      final route = buildRoute(
+        candidates: candidates,
+        selectedMode: SelectedMode.balanced,
+      );
+
+      expect(
+        route.tasks.map((task) => task.priority),
+        everyElement(StudyTaskPriority.standard),
+      );
+    });
+
+    test('keeps an urgent bridge and its target at the same priority', () {
+      const candidate = StudyCandidate(
+        topicId: 'limit_ve_sureklilik',
+        primarySource: CandidateSource.progress,
+        sources: {CandidateSource.progress, CandidateSource.repair},
+        requiresBridge: true,
+        bridgeTopicId: 'fonksiyonlar',
+        signals: [
+          CandidateSignal(
+            source: CandidateSource.repair,
+            reason: CandidateReason.performanceDecline,
+            strength: 0.90,
+          ),
+        ],
+      );
+
+      final route = buildRoute(
+        candidates: const [candidate],
+        selectedMode: SelectedMode.balanced,
+      );
+
+      expect(route.tasks, hasLength(2));
+      expect(
+        route.tasks.map((task) => task.priority),
+        everyElement(StudyTaskPriority.urgent),
+      );
     });
 
     test('deduplicates shared bridge topic across multiple targets', () {
@@ -182,18 +277,14 @@ void main() {
         StudyCandidate(
           topicId: 'target_a',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: true,
           bridgeTopicId: 'fonksiyonlar',
         ),
         StudyCandidate(
           topicId: 'target_b',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: true,
           bridgeTopicId: 'fonksiyonlar',
         ),
@@ -222,18 +313,14 @@ void main() {
         StudyCandidate(
           topicId: 'fonksiyonlar',
           primarySource: CandidateSource.progress,
-          sources: {
-            CandidateSource.progress,
-          },
+          sources: {CandidateSource.progress},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
         StudyCandidate(
           topicId: 'trigonometri',
           primarySource: CandidateSource.repair,
-          sources: {
-            CandidateSource.repair,
-          },
+          sources: {CandidateSource.repair},
           requiresBridge: false,
           bridgeTopicId: null,
         ),
@@ -254,14 +341,8 @@ void main() {
       for (var i = 0; i < first.tasks.length; i++) {
         expect(first.tasks[i].topicId, second.tasks[i].topicId);
         expect(first.tasks[i].type, second.tasks[i].type);
-        expect(
-          first.tasks[i].sourceTopicId,
-          second.tasks[i].sourceTopicId,
-        );
-        expect(
-          first.tasks[i].questionTarget,
-          second.tasks[i].questionTarget,
-        );
+        expect(first.tasks[i].sourceTopicId, second.tasks[i].sourceTopicId);
+        expect(first.tasks[i].questionTarget, second.tasks[i].questionTarget);
       }
     });
 

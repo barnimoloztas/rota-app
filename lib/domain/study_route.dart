@@ -1,12 +1,8 @@
 import 'topic.dart';
 
-enum StudyTaskType {
-  progress,
-  practice,
-  repair,
-  measurement,
-  bridge,
-}
+enum StudyTaskType { progress, practice, repair, measurement, bridge }
+
+enum StudyTaskPriority { standard, urgent }
 
 class StudyTask {
   const StudyTask({
@@ -14,6 +10,7 @@ class StudyTask {
     required this.type,
     required this.sourceTopicId,
     this.questionTarget,
+    this.priority = StudyTaskPriority.standard,
   });
 
   final TopicId topicId;
@@ -23,12 +20,12 @@ class StudyTask {
   final TopicId sourceTopicId;
 
   final int? questionTarget;
+
+  final StudyTaskPriority priority;
 }
 
 class StudyRoute {
-  const StudyRoute({
-    required this.tasks,
-  });
+  const StudyRoute({required this.tasks});
 
   final List<StudyTask> tasks;
 }

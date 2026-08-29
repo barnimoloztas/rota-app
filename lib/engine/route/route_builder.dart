@@ -13,6 +13,7 @@ StudyRoute buildRoute({
 
   for (final candidate in candidates) {
     final bridgeTopicId = candidate.bridgeTopicId;
+    final priority = _priorityForCandidate(candidate);
 
     if (candidate.requiresBridge && bridgeTopicId != null) {
       if (addedBridgeTopicIds.add(bridgeTopicId)) {
@@ -21,6 +22,7 @@ StudyRoute buildRoute({
             topicId: bridgeTopicId,
             type: StudyTaskType.bridge,
             sourceTopicId: candidate.topicId,
+            priority: priority,
           ),
         );
       }
@@ -37,13 +39,33 @@ StudyRoute buildRoute({
           taskType: taskType,
           selectedMode: selectedMode,
         ),
+        priority: priority,
       ),
     );
   }
 
-  return StudyRoute(
-    tasks: List.unmodifiable(tasks),
-  );
+  return StudyRoute(tasks: List.unmodifiable(tasks));
+}
+
+StudyTaskPriority _priorityForCandidate(StudyCandidate candidate) {
+  for (final signal in candidate.signals) {
+    switch (signal.reason) {
+      case CandidateReason.initialPractice:
+      case CandidateReason.practiceDevelopment:
+      case CandidateReason.chronicWeakness:
+      case CandidateReason.performanceDecline:
+        return StudyTaskPriority.urgent;
+
+      case CandidateReason.practiceMaintenance:
+      case CandidateReason.lowMastery:
+      case CandidateReason.lowConfidence:
+      case CandidateReason.staleEvidence:
+      case CandidateReason.insufficientEvidence:
+        break;
+    }
+  }
+
+  return StudyTaskPriority.standard;
 }
 
 int? _questionTargetForTask({
@@ -62,9 +84,7 @@ int? _questionTargetForTask({
   }
 }
 
-StudyTaskType _taskTypeForSource(
-  CandidateSource source,
-) {
+StudyTaskType _taskTypeForSource(CandidateSource source) {
   switch (source) {
     case CandidateSource.progress:
       return StudyTaskType.progress;
