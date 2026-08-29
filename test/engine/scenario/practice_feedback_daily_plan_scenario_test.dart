@@ -103,10 +103,20 @@ void main() {
         completedAcademicTaskIndexes: const {},
         topicLifecycle: lifecycle,
         completedAt: firstDay,
+        actualQuestionCount: 40,
+        correctCount: 31,
+        wrongCount: 7,
+        blankCount: 2,
       );
       lifecycle = completion.topicLifecycle;
 
       expect(completion.didComplete, isTrue);
+      expect(completion.completionRecord!.topicId, 'functions');
+      expect(completion.completionRecord!.completedAt, firstDay);
+      expect(completion.completionRecord!.actualQuestionCount, 40);
+      expect(completion.completionRecord!.correctCount, 31);
+      expect(completion.completionRecord!.wrongCount, 7);
+      expect(completion.completionRecord!.blankCount, 2);
       expect(completion.completedAcademicTaskIndexes, {0});
       expect(lifecycle.completedInitialPracticeCount, 1);
       expect(lifecycle.firstPracticeCompletedAt, firstDay);

@@ -57,6 +57,13 @@ void main() {
       existingCompletedIndexes.add(1);
 
       expect(result.didComplete, isTrue);
+      expect(result.completionRecord, isNotNull);
+      expect(result.completionRecord!.topicId, 'functions');
+      expect(result.completionRecord!.completedAt, completedAt);
+      expect(result.completionRecord!.actualQuestionCount, isNull);
+      expect(result.completionRecord!.correctCount, isNull);
+      expect(result.completionRecord!.wrongCount, isNull);
+      expect(result.completionRecord!.blankCount, isNull);
       expect(result.topicLifecycle.completedInitialPracticeCount, 1);
       expect(result.topicLifecycle.firstPracticeCompletedAt, completedAt);
       expect(result.completedAcademicTaskIndexes, {0});
@@ -89,6 +96,7 @@ void main() {
       );
 
       expect(repeatedCompletion.didComplete, isFalse);
+      expect(repeatedCompletion.completionRecord, isNull);
       expect(
         repeatedCompletion.topicLifecycle,
         same(firstCompletion.topicLifecycle),
@@ -102,6 +110,27 @@ void main() {
         firstCompletedAt,
       );
       expect(repeatedCompletion.completedAcademicTaskIndexes, {0});
+    });
+
+    test('records optional question performance on first completion', () {
+      final result = completeDailyPlanPractice(
+        planLifecycle: PlanLifecycle.active,
+        dailyPlan: dailyPlan(),
+        academicTaskIndex: 0,
+        completedAcademicTaskIndexes: const {},
+        topicLifecycle: lifecycle('functions'),
+        completedAt: DateTime.utc(2026, 8, 29),
+        actualQuestionCount: 32,
+        correctCount: 24,
+        wrongCount: 6,
+        blankCount: 2,
+      );
+
+      expect(result.didComplete, isTrue);
+      expect(result.completionRecord!.actualQuestionCount, 32);
+      expect(result.completionRecord!.correctCount, 24);
+      expect(result.completionRecord!.wrongCount, 6);
+      expect(result.completionRecord!.blankCount, 2);
     });
 
     test('uses one stable order across protected and normal tasks', () {

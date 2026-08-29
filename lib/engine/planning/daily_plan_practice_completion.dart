@@ -1,5 +1,6 @@
 import '../../domain/daily_plan_draft.dart';
 import '../../domain/plan_lifecycle.dart';
+import '../../domain/practice_completion_record.dart';
 import '../../domain/study_route.dart';
 import '../../domain/topic_learning_lifecycle.dart';
 import '../practice/practice_completion_lifecycle.dart';
@@ -8,6 +9,7 @@ class DailyPlanPracticeCompletionResult {
   DailyPlanPracticeCompletionResult._({
     required this.topicLifecycle,
     required this.didComplete,
+    required this.completionRecord,
     required Set<int> completedAcademicTaskIndexes,
   }) : completedAcademicTaskIndexes = Set<int>.unmodifiable(
          Set<int>.of(completedAcademicTaskIndexes),
@@ -17,6 +19,12 @@ class DailyPlanPracticeCompletionResult {
 
   /// Whether this call completed the planned Practice for the first time.
   final bool didComplete;
+
+  /// The completion record emitted by this call.
+  ///
+  /// Null means the planned Practice had already been completed, so this call
+  /// did not emit another record.
+  final PracticeCompletionRecord? completionRecord;
 
   /// Completed task positions in the frozen active plan.
   ///
@@ -31,6 +39,10 @@ DailyPlanPracticeCompletionResult completeDailyPlanPractice({
   required Set<int> completedAcademicTaskIndexes,
   required TopicLearningLifecycle topicLifecycle,
   required DateTime completedAt,
+  int? actualQuestionCount,
+  int? correctCount,
+  int? wrongCount,
+  int? blankCount,
 }) {
   if (planLifecycle != PlanLifecycle.active) {
     throw StateError('Only an active daily plan can be completed.');
@@ -62,9 +74,19 @@ DailyPlanPracticeCompletionResult completeDailyPlanPractice({
     return DailyPlanPracticeCompletionResult._(
       topicLifecycle: topicLifecycle,
       didComplete: false,
+      completionRecord: null,
       completedAcademicTaskIndexes: completedAcademicTaskIndexes,
     );
   }
+
+  final completionRecord = PracticeCompletionRecord(
+    topicId: plannedTask.topicId,
+    completedAt: completedAt,
+    actualQuestionCount: actualQuestionCount,
+    correctCount: correctCount,
+    wrongCount: wrongCount,
+    blankCount: blankCount,
+  );
 
   return DailyPlanPracticeCompletionResult._(
     topicLifecycle: completePractice(
@@ -72,6 +94,7 @@ DailyPlanPracticeCompletionResult completeDailyPlanPractice({
       completedAt: completedAt,
     ),
     didComplete: true,
+    completionRecord: completionRecord,
     completedAcademicTaskIndexes: {
       ...completedAcademicTaskIndexes,
       academicTaskIndex,
