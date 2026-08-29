@@ -7,10 +7,10 @@ import 'package:rota_app/domain/subject_study_route.dart';
 import 'package:rota_app/domain/topic_learning_lifecycle.dart';
 import 'package:rota_app/engine/candidate/practice_candidate_generator.dart';
 import 'package:rota_app/engine/planning/daily_plan_activation.dart';
+import 'package:rota_app/engine/planning/daily_plan_practice_completion.dart';
 import 'package:rota_app/engine/planning/global_study_route_composer.dart';
 import 'package:rota_app/engine/planning/subject_plan_task_mapper.dart';
 import 'package:rota_app/engine/planning/untouched_daily_plan_composer.dart';
-import 'package:rota_app/engine/practice/practice_completion_lifecycle.dart';
 import 'package:rota_app/engine/route/route_builder.dart';
 import 'package:rota_app/engine/route/route_selector.dart';
 import 'package:rota_app/engine/signal/practice_signal_generator.dart';
@@ -96,8 +96,18 @@ void main() {
       expect(activation.lifecycle, PlanLifecycle.active);
       expect(activation.allocatedSlotsBySubject, {'mathematics': 1});
 
-      lifecycle = completePractice(lifecycle: lifecycle, completedAt: firstDay);
+      final completion = completeDailyPlanPractice(
+        planLifecycle: activation.lifecycle,
+        dailyPlan: firstDraft,
+        academicTaskIndex: 0,
+        completedAcademicTaskIndexes: const {},
+        topicLifecycle: lifecycle,
+        completedAt: firstDay,
+      );
+      lifecycle = completion.topicLifecycle;
 
+      expect(completion.didComplete, isTrue);
+      expect(completion.completedAcademicTaskIndexes, {0});
       expect(lifecycle.completedInitialPracticeCount, 1);
       expect(lifecycle.firstPracticeCompletedAt, firstDay);
       expect(activation.allocatedSlotsBySubject, {'mathematics': 1});
